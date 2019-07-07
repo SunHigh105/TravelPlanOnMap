@@ -1,0 +1,45 @@
+#map {
+    height: 60%;
+    width: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+[v-cloak]{
+    display: none;
+}
+
+.top-bar{
+    background-color: #8bcc7c;
+}
+
+#searchForm{
+    margin: 0 30px;
+}
+
+.card{
+    width: 80%;
+}
+
+.card-divider{
+    padding: 0.5rem;
+}
+
+.place p{
+    font-size: 1.2rem;
+    margin: 1rem 0 0 0;
+}
+
+#search{
+    margin: 1.3rem 0;
+}
+
+.deleteButton{
+    margin: 0.5rem 0 0 0;
+    float: right;
+}
