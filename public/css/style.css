@@ -10,12 +10,20 @@ html, body {
     overflow-x: hidden;
 }
 
+h3{
+    text-align: center;
+}
+
 [v-cloak]{
     display: none;
 }
 
 .top-bar{
     background-color: #8bcc7c;
+}
+
+.container{
+    padding-top: 20px;
 }
 
 #searchForm{
@@ -42,4 +50,26 @@ html, body {
 .deleteButton{
     margin: 0.5rem 0 0 0;
     float: right;
+}
+
+/* popup */
+#popup-bg{
+    /* display: none; */
+    /* display: block; */
+    background-color: rgba(0, 0, 0, 0.5);
+    left: 0;
+    right: 0;
+    top:0;
+    bottom: 0;
+    z-index: 1;
+    position: fixed;
+}
+
+.popup{
+    margin-top: 10vh;
+    height: 80vh;
+    padding: 3vh 7vh;
+    vertical-align: middle;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.0975);
 }
