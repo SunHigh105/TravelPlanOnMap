@@ -3,10 +3,12 @@
 @section('content')
 <!--<div id="map"></div>-->
 <div id="app">
-    <map-component></map-component>
+    <!--<map-component></map-component>
     <div class="container">
-        <form-component></form-component>
+        
     </div>
+    -->
+    <form-component></form-component>
 </div>
 
 @endsection

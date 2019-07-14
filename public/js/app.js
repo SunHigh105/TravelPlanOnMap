@@ -4279,6 +4279,42 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4290,7 +4326,13 @@ __webpack_require__.r(__webpack_exports__);
       outputs: [],
       popupStyle: {
         "display": "block"
-      }
+      },
+      center: {
+        lat: 35.6585805,
+        lng: 139.7454329
+      },
+      zoom: 12,
+      markers: []
     };
   },
   mounted: function mounted() {
@@ -4306,8 +4348,7 @@ __webpack_require__.r(__webpack_exports__);
         });
       } else {
         alert('目的地の登録は最大10件です。');
-      } // console.log(this.items);
-
+      }
     },
     deleteForm: function deleteForm() {
       if (this.items.length > 1) {
@@ -4329,12 +4370,7 @@ __webpack_require__.r(__webpack_exports__);
 
         if (msg != '') {
           throw new Error(msg);
-        } //データを送る
-        // axios.post('', {
-        // }).then((response) => {
-        // });
-        // console.log(this.items);
-
+        }
 
         this.createPlaceLists();
       } catch (e) {
@@ -4344,17 +4380,13 @@ __webpack_require__.r(__webpack_exports__);
     createPlaceLists: function createPlaceLists() {
       var _this = this;
 
-      this.hiddenForm();
       this.items.forEach(function (item) {
-        //目的地取得
+        console.log(item); //目的地取得
+
         axios.post('api/place', {
           place: encodeURI(item.place)
         }).then(function (response) {
-          var results = response.data.results[0]; // 地図の中心
-          // point = {
-          //     lat: results.geometry.location.lat,
-          //     lng: results.geometry.location.lng
-          // };
+          var results = response.data.results[0];
 
           _this.outputs.push({
             index: item.index,
@@ -4364,10 +4396,24 @@ __webpack_require__.r(__webpack_exports__);
             lat: results.geometry.location.lat,
             lng: results.geometry.location.lng
           });
+
+          _this.markers.push({
+            position: {
+              lat: results.geometry.location.lat,
+              lng: results.geometry.location.lng
+            },
+            label: String(item.index)
+          });
+
+          if (item.index === 1) {
+            //地図の中心
+            _this.center.lat = results.geometry.location.lat;
+            _this.center.lng = results.geometry.location.lng;
+          }
         }); //移動時間・移動距離取得
 
         if (item.index >= 2) {
-          console.log(_this.items[item.index - 2].place);
+          // console.log(this.items[item.index - 2].place);
           axios.post('api/route', {
             origin: encodeURI(_this.items[item.index - 2].place),
             destination: encodeURI(item.place)
@@ -4377,9 +4423,9 @@ __webpack_require__.r(__webpack_exports__);
             _this.$set(_this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text);
           });
         }
-
-        console.log(_this.outputs);
       });
+      console.log(this.center);
+      this.hiddenForm();
     },
     hiddenForm: function hiddenForm() {
       this.popupStyle["display"] = "none";
@@ -4420,11 +4466,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-// import {gmapApi} from 'vue2-google-maps'
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4434,6 +4475,12 @@ __webpack_require__.r(__webpack_exports__);
       },
       zoom: 12
     };
+  },
+  mounted: function mounted() {
+    this.getCenter();
+  },
+  methods: {
+    getCenter: function getCenter() {}
   } // computed:{
   //     google: gmapApi
   // }
@@ -40679,186 +40726,267 @@ var render = function() {
     "div",
     { attrs: { id: "form-component" } },
     [
-      _c("div", { style: _vm.popupStyle, attrs: { id: "popup-bg" } }, [
-        _c("div", { staticClass: "popup" }, [
-          _c("h3", [_vm._v("目的地の設定")]),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "grid-container" },
-            [
-              _vm._l(_vm.items, function(item) {
-                return _c(
-                  "div",
-                  { key: item.index, staticClass: "grid-x grid-padding-x" },
-                  [
-                    _c("input", {
-                      attrs: { type: "hidden" },
-                      domProps: { value: item.index }
-                    }),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "cell medium-6" }, [
-                      _c("label", [
-                        _vm._v("目的地" + _vm._s(item.index)),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: item.place,
-                              expression: "item.place"
-                            }
-                          ],
-                          staticClass: "place",
-                          attrs: { type: "text" },
-                          domProps: { value: item.place },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(item, "place", $event.target.value)
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "cell medium-4" }, [
-                      _c("label", [
-                        _vm._v("滞在時間(分)"),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: item.time,
-                              expression: "item.time"
-                            }
-                          ],
-                          staticClass: "time",
-                          attrs: { type: "number" },
-                          domProps: { value: item.time },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(item, "time", $event.target.value)
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    item.index > 1 && item.index === _vm.items.length
-                      ? _c(
-                          "button",
-                          {
-                            staticClass: "button secondary",
-                            attrs: { id: "deleteForm" },
-                            on: {
-                              click: function($event) {
-                                return _vm.deleteForm()
-                              }
-                            }
-                          },
-                          [_vm._v("Delete")]
-                        )
-                      : _vm._e()
-                  ]
-                )
-              }),
+      _c(
+        "GmapMap",
+        {
+          staticStyle: { width: "1000px", height: "400px" },
+          attrs: {
+            center: _vm.center,
+            zoom: _vm.zoom,
+            "map-type-id": "roadmap"
+          }
+        },
+        _vm._l(_vm.markers, function(m, index) {
+          return _c("GmapMarker", {
+            key: index,
+            attrs: {
+              position: m.position,
+              label: m.label,
+              clickable: true,
+              draggable: false
+            },
+            on: {
+              click: function($event) {
+                _vm.center = m.position
+              }
+            }
+          })
+        }),
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "container" },
+        [
+          _c("div", { style: _vm.popupStyle, attrs: { id: "popup-bg" } }, [
+            _c("div", { staticClass: "popup" }, [
+              _c("h3", [_vm._v("目的地の設定")]),
               _vm._v(" "),
-              _c("div", { staticClass: "grid-x grid-padding-x" }, [
-                _c("div", { staticClass: "cell medium-4" }, [
+              _c(
+                "div",
+                { staticClass: "grid-container" },
+                [
+                  _vm._l(_vm.items, function(item) {
+                    return _c(
+                      "div",
+                      { key: item.index, staticClass: "grid-x grid-padding-x" },
+                      [
+                        _c("input", {
+                          attrs: { type: "hidden" },
+                          domProps: { value: item.index }
+                        }),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "cell medium-6" }, [
+                          _c("label", [
+                            _vm._v("目的地" + _vm._s(item.index)),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: item.place,
+                                  expression: "item.place"
+                                }
+                              ],
+                              staticClass: "place",
+                              attrs: { type: "text" },
+                              domProps: { value: item.place },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(item, "place", $event.target.value)
+                                }
+                              }
+                            })
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "cell medium-4" }, [
+                          _c("label", [
+                            _vm._v("滞在時間(分)"),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: item.time,
+                                  expression: "item.time"
+                                }
+                              ],
+                              staticClass: "time",
+                              attrs: {
+                                type: "number",
+                                min: "10",
+                                max: "2000",
+                                step: "10"
+                              },
+                              domProps: { value: item.time },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(item, "time", $event.target.value)
+                                }
+                              }
+                            })
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        item.index > 1 && item.index === _vm.items.length
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "button secondary",
+                                attrs: { id: "deleteForm" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.deleteForm()
+                                  }
+                                }
+                              },
+                              [_vm._v("Delete")]
+                            )
+                          : _vm._e()
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "grid-x grid-padding-x" }, [
+                    _c("div", { staticClass: "cell medium-4" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "hollow button secondary",
+                          on: {
+                            click: function($event) {
+                              return _vm.addForm()
+                            }
+                          }
+                        },
+                        [_vm._v("＋目的地を追加")]
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _vm._m(0),
+                  _vm._v(" "),
                   _c(
                     "button",
                     {
-                      staticClass: "hollow button secondary",
+                      staticClass: "button",
+                      attrs: { id: "search" },
                       on: {
                         click: function($event) {
-                          return _vm.addForm()
+                          return _vm.sendPlaces()
                         }
                       }
                     },
-                    [_vm._v("＋目的地を追加")]
+                    [_vm._v("Search")]
                   )
-                ])
-              ]),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "button",
-                  attrs: { id: "search" },
-                  on: {
-                    click: function($event) {
-                      return _vm.sendPlaces()
-                    }
-                  }
-                },
-                [_vm._v("Search")]
+                ],
+                2
               )
-            ],
-            2
-          )
-        ])
-      ]),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "button",
-          on: {
-            click: function($event) {
-              return _vm.dispForm()
-            }
-          }
-        },
-        [_vm._v("Edit")]
-      ),
-      _vm._v(" "),
-      _vm._l(_vm.outputs, function(output) {
-        return _c("div", { key: output.index, attrs: { id: "list" } }, [
-          output.distance
-            ? _c("div", { staticClass: "card" }, [
+            ])
+          ]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "button",
+              on: {
+                click: function($event) {
+                  return _vm.dispForm()
+                }
+              }
+            },
+            [_vm._v("Edit")]
+          ),
+          _vm._v(" "),
+          _vm._l(_vm.outputs, function(output) {
+            return _c("div", { key: output.index, attrs: { id: "list" } }, [
+              output.distance
+                ? _c("div", { staticClass: "card" }, [
+                    _c("div", { staticClass: "card-section" }, [
+                      _c("div", { staticClass: "distance" }, [
+                        _vm._v(_vm._s(output.distance))
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "duration" }, [
+                        _vm._v(_vm._s(output.duration))
+                      ])
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("div", { staticClass: "card" }, [
+                _c("div", { staticClass: "card-divider grid-x" }, [
+                  _c("div", { staticClass: "place cell medium-9" }, [
+                    _c("p", {}, [
+                      _vm._v(
+                        "【" +
+                          _vm._s(output.index) +
+                          "】 " +
+                          _vm._s(output.place)
+                      )
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
                 _c("div", { staticClass: "card-section" }, [
-                  _c("div", { staticClass: "distance" }, [
-                    _vm._v(_vm._s(output.distance))
+                  _c("p", {}, [_vm._v("住所：" + _vm._s(output.address))]),
+                  _vm._v(" "),
+                  _c("p", {}, [
+                    _vm._v("滞在時間：" + _vm._s(output.time) + "分")
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "duration" }, [
-                    _vm._v(_vm._s(output.duration))
-                  ])
+                  _c("input", {
+                    attrs: { name: "lat", type: "hidden" },
+                    domProps: { value: output.lat }
+                  }),
+                  _vm._v(" "),
+                  _c("input", {
+                    attrs: { name: "lng", type: "hidden" },
+                    domProps: { value: output.lng }
+                  })
                 ])
               ])
-            : _vm._e(),
-          _vm._v(" "),
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-divider grid-x" }, [
-              _c("div", { staticClass: "place cell medium-9" }, [
-                _c("p", {}, [
-                  _vm._v(
-                    "【" + _vm._s(output.index) + "】 " + _vm._s(output.place)
-                  )
-                ])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-section" }, [
-              _c("p", {}, [_vm._v("住所：" + _vm._s(output.address))]),
-              _vm._v(" "),
-              _c("p", {}, [_vm._v("滞在時間：" + _vm._s(output.time) + "分")])
             ])
-          ])
-        ])
-      })
+          })
+        ],
+        2
+      )
     ],
-    2
+    1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "grid-x grid-padding-x" }, [
+      _c("div", { staticClass: "cell medium-2" }, [
+        _c("select", [
+          _c("option", { attrs: { value: "" } }, [_vm._v("00")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "" } }, [_vm._v("01")])
+        ])
+      ]),
+      _vm._v("\n                        :\n                        "),
+      _c("div", { staticClass: "cell medium-2" }, [
+        _c("select", [
+          _c("option", { attrs: { value: "" } }, [_vm._v("00")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "" } }, [_vm._v("10")])
+        ])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -53046,11 +53174,9 @@ __webpack_require__.r(__webpack_exports__);
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); // require('dotenv').config();
+__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
-
- // var apikey = "{{ env('API_KEY') }}";
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue2_google_maps__WEBPACK_IMPORTED_MODULE_1__, {
   load: {
@@ -53069,10 +53195,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
  */
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-// Vue.component(
-//     'example-component', 
-//     require('./components/ExampleComponent.vue').default
-// );
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('form-component', __webpack_require__(/*! ./components/FormComponent.vue */ "./resources/js/components/FormComponent.vue")["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('map-component', __webpack_require__(/*! ./components/MapComponent.vue */ "./resources/js/components/MapComponent.vue")["default"]);
