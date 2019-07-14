@@ -38,6 +38,26 @@
                             <button class="hollow button secondary" v-on:click="addForm()">＋目的地を追加</button>
                         </div>
                     </div>
+                    <label>出発時刻</label>
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell medium-2">
+                            <select v-model="hour">
+                                <option v-for="hour in selectHour" 
+                                v-bind:key="hour.val" 
+                                v-bind:value="hour.val">{{ hour.disp }}
+                                </option>
+                            </select>
+                        </div>
+                        :
+                        <div class="cell medium-2">
+                            <select v-model="minute">
+                                <option v-for="minute in selectMinute" 
+                                v-bind:key="minute.val" 
+                                v-bind:value="minute.val">{{ minute.disp }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                     <button id="search" class="button" v-on:click="sendPlaces()">Search</button>
                 </div>
             </div>
@@ -86,12 +106,32 @@ export default {
             },
             zoom: 12,
             markers: [],
+            selectHour:[],
+            selectMinute:[],
+            hour:'',
+            minute:'',
         }
     },
     mounted() {
         console.log('This is FormComponent.');
+        this.createSelectList();
     },
     methods: {
+        createSelectList(){
+            for(var i = 0; i <= 5; i++){
+                this.selectMinute.push({
+                    val: i * 10,
+                    disp: String(i * 10).padStart(2,'0'),
+                });
+            }
+            for(var i = 0; i <= 23; i++){
+                //ゼロ埋め
+                this.selectHour.push({
+                    val: i,
+                    disp: String(i).padStart(2,'0'),
+                });
+            }
+        },
         addForm(){
             if(this.items.length < 10){
                 this.items.push({
@@ -119,6 +159,9 @@ export default {
                         msg = msg + '滞在時間' + item.index + 'を入力してください！\n';
                     }
                 });
+                if(this.hour === '' || this.minute === ''){
+                    msg = msg + '出発時刻を設定してください！';
+                }
                 if(msg != ''){
                     throw new Error(msg);
                 }

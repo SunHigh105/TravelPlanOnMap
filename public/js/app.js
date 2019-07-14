@@ -4315,6 +4315,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4332,13 +4337,34 @@ __webpack_require__.r(__webpack_exports__);
         lng: 139.7454329
       },
       zoom: 12,
-      markers: []
+      markers: [],
+      selectHour: [],
+      selectMinute: [],
+      hour: '',
+      minute: ''
     };
   },
   mounted: function mounted() {
     console.log('This is FormComponent.');
+    this.createSelectList();
   },
   methods: {
+    createSelectList: function createSelectList() {
+      for (var i = 0; i <= 5; i++) {
+        this.selectMinute.push({
+          val: i * 10,
+          disp: String(i * 10).padStart(2, '0')
+        });
+      }
+
+      for (var i = 0; i <= 23; i++) {
+        //ゼロ埋め
+        this.selectHour.push({
+          val: i,
+          disp: String(i).padStart(2, '0')
+        });
+      }
+    },
     addForm: function addForm() {
       if (this.items.length < 10) {
         this.items.push({
@@ -4367,6 +4393,10 @@ __webpack_require__.r(__webpack_exports__);
             msg = msg + '滞在時間' + item.index + 'を入力してください！\n';
           }
         });
+
+        if (this.hour === '' || this.minute === '') {
+          msg = msg + '出発時刻を設定してください！';
+        }
 
         if (msg != '') {
           throw new Error(msg);
@@ -40872,7 +40902,102 @@ var render = function() {
                     ])
                   ]),
                   _vm._v(" "),
-                  _vm._m(0),
+                  _c("label", [_vm._v("出発時刻")]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "grid-x grid-padding-x" }, [
+                    _c("div", { staticClass: "cell medium-2" }, [
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.hour,
+                              expression: "hour"
+                            }
+                          ],
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.hour = $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            }
+                          }
+                        },
+                        _vm._l(_vm.selectHour, function(hour) {
+                          return _c(
+                            "option",
+                            { key: hour.val, domProps: { value: hour.val } },
+                            [
+                              _vm._v(
+                                _vm._s(hour.disp) +
+                                  "\n                                "
+                              )
+                            ]
+                          )
+                        }),
+                        0
+                      )
+                    ]),
+                    _vm._v(
+                      "\n                        :\n                        "
+                    ),
+                    _c("div", { staticClass: "cell medium-2" }, [
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.minute,
+                              expression: "minute"
+                            }
+                          ],
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.minute = $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            }
+                          }
+                        },
+                        _vm._l(_vm.selectMinute, function(minute) {
+                          return _c(
+                            "option",
+                            {
+                              key: minute.val,
+                              domProps: { value: minute.val }
+                            },
+                            [
+                              _vm._v(
+                                _vm._s(minute.disp) +
+                                  "\n                                "
+                              )
+                            ]
+                          )
+                        }),
+                        0
+                      )
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c(
                     "button",
@@ -40963,30 +41088,7 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "grid-x grid-padding-x" }, [
-      _c("div", { staticClass: "cell medium-2" }, [
-        _c("select", [
-          _c("option", { attrs: { value: "" } }, [_vm._v("00")]),
-          _vm._v(" "),
-          _c("option", { attrs: { value: "" } }, [_vm._v("01")])
-        ])
-      ]),
-      _vm._v("\n                        :\n                        "),
-      _c("div", { staticClass: "cell medium-2" }, [
-        _c("select", [
-          _c("option", { attrs: { value: "" } }, [_vm._v("00")]),
-          _vm._v(" "),
-          _c("option", { attrs: { value: "" } }, [_vm._v("10")])
-        ])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
