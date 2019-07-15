@@ -64,6 +64,7 @@
         </div>
         <!--目的地リスト表示-->
         <button class="button" v-on:click="dispForm()">Edit</button>
+        <!--<div>【出発時刻】 {{ String(hour).padStart(2, '0') }} : {{ String(minute).padStart(2, '0') }}</div>-->
         <div id="list" v-for="output in outputs" v-bind:key="output.index">
             <div class="card" v-if="output.distance">
                 <div class="card-section">
@@ -73,7 +74,9 @@
             </div>
             <div class="card">
                 <div class="card-divider grid-x" >
-                    <div class="place cell medium-9"><p v-cloak>【{{ output.index }}】 {{ output.place }}</p></div>
+                    <div class="place cell medium-9">
+                        <p v-cloak>【{{ output.index }}】 {{ output.place }}</p>
+                        <span>{{ output.fromTime }} ~ {{ output.toTime }}</span></div>
                 </div>
                 <div class="card-section">
                     <p v-cloak>住所：{{ output.address }}</p>
@@ -170,14 +173,37 @@ export default {
                 alert(e);
             }
         },
+        calcTime(hour, minute, time){
+            var h = hour;
+            var m = minute + time;
+            console.log(h);
+            console.log(m);
+            if(m >= 60){
+                h = h + Math.floor(m / 60);
+                m = m % 60;
+            }
+            if(h >= 24){
+                h = h - 24;
+            }
+            console.log(h);
+            console.log(m);
+            return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
+
+        },
         createPlaceLists(){
+            var totalTime = 0;
+            var fromTime = '';
+            var toTime = '';
             this.items.forEach(item => {
-                console.log(item);
+                // console.log(item);
                 //目的地取得
                 axios.post('api/place', {
                     place: encodeURI(item.place)
                 }).then((response) => {
                     var results = response.data.results[0];
+                    fromTime = this.calcTime(this.hour, this.minute, totalTime);
+                    totalTime = totalTime + parseInt(item.time, 10);
+                    toTime = this.calcTime(this.hour, this.minute, totalTime);
                     this.outputs.push({
                         index: item.index,
                         address: results.formatted_address,
@@ -185,6 +211,8 @@ export default {
                         time: item.time,
                         lat: results.geometry.location.lat,
                         lng: results.geometry.location.lng,
+                        fromTime: fromTime,
+                        toTime: toTime,
                     });
                     this.markers.push({
                         position: {
@@ -207,12 +235,13 @@ export default {
                         origin: encodeURI(this.items[item.index - 2].place),
                         destination: encodeURI(item.place)
                     }).then((response) => {
+                        // console.log(response);
                         this.$set(this.outputs[item.index - 1], 'distance', response.data.routes[0].legs[0].distance.text);
                         this.$set(this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text);
                     });
                 }
             }); 
-            console.log(this.center);
+            // console.log(this.center);
             this.hiddenForm();
         },
         hiddenForm(){

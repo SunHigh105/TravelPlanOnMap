@@ -4320,6 +4320,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4407,16 +4410,41 @@ __webpack_require__.r(__webpack_exports__);
         alert(e);
       }
     },
+    calcTime: function calcTime(hour, minute, time) {
+      var h = hour;
+      var m = minute + time;
+      console.log(h);
+      console.log(m);
+
+      if (m >= 60) {
+        h = h + Math.floor(m / 60);
+        m = m % 60;
+      }
+
+      if (h >= 24) {
+        h = h - 24;
+      }
+
+      console.log(h);
+      console.log(m);
+      return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
+    },
     createPlaceLists: function createPlaceLists() {
       var _this = this;
 
+      var totalTime = 0;
+      var fromTime = '';
+      var toTime = '';
       this.items.forEach(function (item) {
-        console.log(item); //目的地取得
-
+        // console.log(item);
+        //目的地取得
         axios.post('api/place', {
           place: encodeURI(item.place)
         }).then(function (response) {
           var results = response.data.results[0];
+          fromTime = _this.calcTime(_this.hour, _this.minute, totalTime);
+          totalTime = totalTime + parseInt(item.time, 10);
+          toTime = _this.calcTime(_this.hour, _this.minute, totalTime);
 
           _this.outputs.push({
             index: item.index,
@@ -4424,7 +4452,9 @@ __webpack_require__.r(__webpack_exports__);
             place: item.place,
             time: item.time,
             lat: results.geometry.location.lat,
-            lng: results.geometry.location.lng
+            lng: results.geometry.location.lng,
+            fromTime: fromTime,
+            toTime: toTime
           });
 
           _this.markers.push({
@@ -4448,13 +4478,14 @@ __webpack_require__.r(__webpack_exports__);
             origin: encodeURI(_this.items[item.index - 2].place),
             destination: encodeURI(item.place)
           }).then(function (response) {
+            // console.log(response);
             _this.$set(_this.outputs[item.index - 1], 'distance', response.data.routes[0].legs[0].distance.text);
 
             _this.$set(_this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text);
           });
         }
-      });
-      console.log(this.center);
+      }); // console.log(this.center);
+
       this.hiddenForm();
     },
     hiddenForm: function hiddenForm() {
@@ -41057,6 +41088,12 @@ var render = function() {
                           "】 " +
                           _vm._s(output.place)
                       )
+                    ]),
+                    _vm._v(" "),
+                    _c("span", [
+                      _vm._v(
+                        _vm._s(output.fromTime) + " ~ " + _vm._s(output.toTime)
+                      )
                     ])
                   ])
                 ]),
@@ -53318,119 +53355,107 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
 // }
 // // 初回読み込み時
 // initMap();
-
-var vm = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
-  el: '#searchForm',
-  data: {
-    num: 0,
-    lists: [],
-    place: '',
-    time: '',
-    markers: [],
-    origin: ''
-  },
-  methods: {
-    getLocation: function getLocation() {
-      var _this = this;
-
-      axios.post('api/place', {
-        place: encodeURI(this.place)
-      }).then(function (response) {
-        var results = response.data.results[0]; // 地図の中心
-
-        point = {
-          lat: results.geometry.location.lat,
-          lng: results.geometry.location.lng
-        }; //地図を表示
-
-        initMap();
-
-        _this.lists.push({
-          // num: this.num + 1,
-          address: results.formatted_address,
-          place: _this.place,
-          time: _this.time,
-          lat: results.geometry.location.lat,
-          lng: results.geometry.location.lng
-        }); // if(this.lists.length > 1){
-        //     this.getRoute(this.origin, this.place, this.lists.length - 1);
-        // }
-
-
-        console.log(_this.lists); // マーカーを追加
-
-        _this.addMarker(point, String(_this.lists.length), map);
-
-        _this.markers.forEach(function (marker) {
-          // マーカーを置く
-          marker.setMap(map);
-        }); // 出発地点設定
-
-
-        _this.origin = _this.place; // this.num = this.num + 1;
-        // 入力フォームのリセット
-
-        _this.place = '';
-        _this.time = '';
-      })["catch"](function (error) {
-        alert('目的地を見つけられませんでした！');
-        console.log(error);
-      });
-    },
-    addMarker: function addMarker(point, index, map) {
-      var marker = new google.maps.Marker({
-        position: point,
-        label: String(index),
-        map: map
-      });
-      this.markers.push(marker);
-    },
-    getRoute: function getRoute(origin, destination, num) {
-      var _this2 = this;
-
-      axios.post('api/route', {
-        origin: encodeURI(origin),
-        destination: encodeURI(destination)
-      }).then(function (response) {
-        _this2.$set(_this2.lists[num], 'distance', response.data.routes[0].legs[0].distance.text);
-
-        _this2.$set(_this2.lists[num], 'duration', response.data.routes[0].legs[0].duration.text);
-      }); // var directionsService = new google.maps.DirectionsService;
-      // var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, draggable: true});
-      // directionsDisplay.setMap(map);
-      // directionsService.route({
-      //     origin: origin,
-      //     destination: destination,
-      //     travelMode: travelMode,
-      // },
-      // function(response, status){
-      //     if(status === 'OK'){
-      //         directionsDisplay.setDirections(response);
-      //     }
-      // });
-    },
-    get_data: function get_data(name) {
-      return this.$data[name];
-    },
-    deleteData: function deleteData(message) {
-      if (!confirm('削除してもよろしいですか？')) {
-        return false;
-      } //削除対象のインデックス
-
-
-      var num = message;
-      this.lists.splice(num, 1); //表示されているマーカーを消す
-      // this.markers[num].setMap(null);
-      //マーカー消す
-
-      this.markers.splice(num, 1);
-      this.markers.forEach(function (marker) {
-        // マーカーを置く
-        marker.setMap(map);
-      });
-    }
-  }
-});
+// const vm = new Vue({
+//     el: '#searchForm',
+//     data:{
+//         num: 0,
+//         lists:[],
+//         place: '',
+//         time: '',
+//         markers:[],
+//         origin: '',
+//     },
+//     methods:{
+//         getLocation: function(){
+//             axios.post('api/place', {place: encodeURI(this.place)}).then((response) => {
+//                 var results = response.data.results[0];
+//                 // 地図の中心
+//                 point = {
+//                     lat: results.geometry.location.lat,
+//                     lng: results.geometry.location.lng
+//                 };
+//                 //地図を表示
+//                 initMap();
+//                 this.lists.push({
+//                     // num: this.num + 1,
+//                     address: results.formatted_address,
+//                     place: this.place,
+//                     time: this.time,
+//                     lat: results.geometry.location.lat,
+//                     lng: results.geometry.location.lng,
+//                 });
+//                 // if(this.lists.length > 1){
+//                 //     this.getRoute(this.origin, this.place, this.lists.length - 1);
+//                 // }
+//                 console.log(this.lists);
+//                 // マーカーを追加
+//                 this.addMarker(point, String(this.lists.length), map);
+//                 this.markers.forEach(marker => {
+//                     // マーカーを置く
+//                     marker.setMap(map);
+//                 });
+//                 // 出発地点設定
+//                 this.origin = this.place;
+//                 // this.num = this.num + 1;
+//                 // 入力フォームのリセット
+//                 this.place = '';
+//                 this.time = '';
+//             }).catch(error => {
+//                 alert('目的地を見つけられませんでした！');
+//                 console.log(error);
+//             });
+//         },
+//         addMarker: function(point, index, map){
+//             var marker = new google.maps.Marker({
+//                 position: point,
+//                 label: String(index),
+//                 map: map
+//             });
+//             this.markers.push(marker);
+//         },
+//         getRoute: function(origin, destination, num){
+//             axios.post('api/route', {
+//                 origin: encodeURI(origin),
+//                 destination: encodeURI(destination)
+//             }).then((response) => {
+//                 this.$set(this.lists[num], 'distance', response.data.routes[0].legs[0].distance.text);
+//                 this.$set(this.lists[num], 'duration', response.data.routes[0].legs[0].duration.text);
+//             });
+//             // var directionsService = new google.maps.DirectionsService;
+//             // var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, draggable: true});
+//             // directionsDisplay.setMap(map);
+//             // directionsService.route({
+//             //     origin: origin,
+//             //     destination: destination,
+//             //     travelMode: travelMode,
+//             // },
+//             // function(response, status){
+//             //     if(status === 'OK'){
+//             //         directionsDisplay.setDirections(response);
+//             //     }
+//             // });
+//         },
+//         get_data(name) {
+//             return this.$data[name];
+//         },
+//         deleteData: function(message){
+//             if(!confirm('削除してもよろしいですか？')){
+//                 return false;
+//             }
+//             //削除対象のインデックス
+//             var num = message;
+//             this.lists.splice(num, 1);
+//             //表示されているマーカーを消す
+//             // this.markers[num].setMap(null);
+//             //マーカー消す
+//             this.markers.splice(num, 1);
+//             this.markers.forEach(marker => {
+//                 // マーカーを置く
+//                 marker.setMap(map);
+//             });
+//         }
+//     },
+// });
 
 /***/ }),
 
