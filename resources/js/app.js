@@ -3,8 +3,18 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-
 require('./bootstrap');
+
+import Vue from 'vue'
+import * as VueGoogleMaps from 'vue2-google-maps'
+
+Vue.use(VueGoogleMaps, {
+  load: {
+    // key: "{{ env('API_KEY') }}",
+    key: process.env.MIX_API_KEY,
+    libraries: 'places', 
+  },
+});
 
 window.Vue = require('vue');
 
@@ -15,29 +25,39 @@ window.Vue = require('vue');
  *
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
-var map;
-var point = {lat: 35.6585805, lng: 139.7454329};
-
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: point,
-        zoom: 12
-    });
-}
-// 初回読み込み時
-initMap();
 
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('place-list', require('./components/PlaceListComponent.vue').default);
+Vue.component(
+    'form-component', 
+    require('./components/FormComponent.vue').default
+);
+Vue.component(
+    'map-component', 
+    require('./components/MapComponent.vue').default
+);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+const app = new Vue({
+    el: '#app',
+});
+
+// var map;
+// var point = {lat: 35.6585805, lng: 139.7454329};
+
+// function initMap() {
+//     map = new google.maps.Map(document.getElementById('map'), {
+//         center: point,
+//         zoom: 12
+//     });
+// }
+// // 初回読み込み時
+// initMap();
 
 const vm = new Vue({
     el: '#searchForm',
@@ -62,7 +82,7 @@ const vm = new Vue({
                 initMap();
 
                 this.lists.push({
-                    num: this.num + 1,
+                    // num: this.num + 1,
                     address: results.formatted_address,
                     place: this.place,
                     time: this.time,
@@ -70,23 +90,23 @@ const vm = new Vue({
                     lng: results.geometry.location.lng,
                 });
 
-                if(this.lists.length > 1){
-                    this.getRoute(this.origin, this.place, this.num);
-                }
+                // if(this.lists.length > 1){
+                //     this.getRoute(this.origin, this.place, this.lists.length - 1);
+                // }
                 console.log(this.lists);
 
                 // マーカーを追加
-                this.addMarker(point, String(this.num + 1), map);
+                this.addMarker(point, String(this.lists.length), map);
 
-                this.lists.forEach(list => {
+                this.markers.forEach(marker => {
                     // マーカーを置く
-                    this.markers[list.num - 1].setMap(map);
+                    marker.setMap(map);
                 });
 
                 // 出発地点設定
                 this.origin = this.place;
 
-                this.num = this.num + 1;
+                // this.num = this.num + 1;
                 // 入力フォームのリセット
                 this.place = '';
                 this.time = '';
@@ -136,12 +156,17 @@ const vm = new Vue({
                 return false;
             }
             //削除対象のインデックス
-            var num = message - 1;
+            var num = message;
             this.lists.splice(num, 1);
             //表示されているマーカーを消す
-            this.markers[num].setMap(null);
+            // this.markers[num].setMap(null);
             //マーカー消す
             this.markers.splice(num, 1);
+
+            this.markers.forEach(marker => {
+                // マーカーを置く
+                marker.setMap(map);
+            });
         }
     },
 });

@@ -15,10 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/users', function () {
-    return View::make('users');
+Route::get('/form', function () {
+    return view('form');
 });
 
 Route::get('/map', function () {
-    return view('layout');
+    return view('map');
 });
