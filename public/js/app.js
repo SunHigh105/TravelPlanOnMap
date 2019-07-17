@@ -4231,6 +4231,8 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! os */ "./node_modules/os-browserify/browser.js");
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(os__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -4323,6 +4325,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4412,9 +4415,8 @@ __webpack_require__.r(__webpack_exports__);
     },
     calcTime: function calcTime(hour, minute, time) {
       var h = hour;
-      var m = minute + time;
-      console.log(h);
-      console.log(m);
+      var m = minute + time; // console.log(h);
+      // console.log(m);
 
       if (m >= 60) {
         h = h + Math.floor(m / 60);
@@ -4423,10 +4425,10 @@ __webpack_require__.r(__webpack_exports__);
 
       if (h >= 24) {
         h = h - 24;
-      }
+      } // console.log(h);
+      // console.log(m);
 
-      console.log(h);
-      console.log(m);
+
       return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
     },
     createPlaceLists: function createPlaceLists() {
@@ -4441,10 +4443,8 @@ __webpack_require__.r(__webpack_exports__);
         axios.post('api/place', {
           place: encodeURI(item.place)
         }).then(function (response) {
-          var results = response.data.results[0];
-          fromTime = _this.calcTime(_this.hour, _this.minute, totalTime);
-          totalTime = totalTime + parseInt(item.time, 10);
-          toTime = _this.calcTime(_this.hour, _this.minute, totalTime);
+          var results = response.data.results[0]; // fromTime = this.calcTime(this.hour, this.minute, totalTime);
+          // toTime = this.calcTime(this.hour, this.minute, totalTime);
 
           _this.outputs.push({
             index: item.index,
@@ -4452,9 +4452,9 @@ __webpack_require__.r(__webpack_exports__);
             place: item.place,
             time: item.time,
             lat: results.geometry.location.lat,
-            lng: results.geometry.location.lng,
-            fromTime: fromTime,
-            toTime: toTime
+            lng: results.geometry.location.lng // fromTime: fromTime,
+            // toTime: toTime,
+
           });
 
           _this.markers.push({
@@ -4468,8 +4468,16 @@ __webpack_require__.r(__webpack_exports__);
           if (item.index === 1) {
             //地図の中心
             _this.center.lat = results.geometry.location.lat;
-            _this.center.lng = results.geometry.location.lng;
+            _this.center.lng = results.geometry.location.lng; //fromTimeとtoTimeを設定
+
+            _this.$set(_this.outputs[item.index - 1], 'fromTime', _this.calcTime(_this.hour, _this.minute, totalTime));
+
+            totalTime = totalTime + parseInt(item.time, 10);
+
+            _this.$set(_this.outputs[item.index - 1], 'toTime', _this.calcTime(_this.hour, _this.minute, totalTime));
           }
+        })["catch"](function (error) {
+          alert('目的地が見つかりませんでした');
         }); //移動時間・移動距離取得
 
         if (item.index >= 2) {
@@ -4479,9 +4487,20 @@ __webpack_require__.r(__webpack_exports__);
             destination: encodeURI(item.place)
           }).then(function (response) {
             // console.log(response);
+            // distanceとduration設定
             _this.$set(_this.outputs[item.index - 1], 'distance', response.data.routes[0].legs[0].distance.text);
 
-            _this.$set(_this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text);
+            _this.$set(_this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text); // 移動時間を分に変換
+
+
+            var duration = response.data.routes[0].legs[0].duration.value;
+            totalTime = totalTime + Math.floor(duration / 60); //fromTimeとtoTimeを設定
+
+            _this.$set(_this.outputs[item.index - 1], 'fromTime', _this.calcTime(_this.hour, _this.minute, totalTime));
+
+            totalTime = totalTime + parseInt(item.time, 10);
+
+            _this.$set(_this.outputs[item.index - 1], 'toTime', _this.calcTime(_this.hour, _this.minute, totalTime));
           });
         }
       }); // console.log(this.center);
@@ -36863,6 +36882,66 @@ return jQuery;
 
 /***/ }),
 
+/***/ "./node_modules/os-browserify/browser.js":
+/*!***********************************************!*\
+  !*** ./node_modules/os-browserify/browser.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+exports.endianness = function () { return 'LE' };
+
+exports.hostname = function () {
+    if (typeof location !== 'undefined') {
+        return location.hostname
+    }
+    else return '';
+};
+
+exports.loadavg = function () { return [] };
+
+exports.uptime = function () { return 0 };
+
+exports.freemem = function () {
+    return Number.MAX_VALUE;
+};
+
+exports.totalmem = function () {
+    return Number.MAX_VALUE;
+};
+
+exports.cpus = function () { return [] };
+
+exports.type = function () { return 'Browser' };
+
+exports.release = function () {
+    if (typeof navigator !== 'undefined') {
+        return navigator.appVersion;
+    }
+    return '';
+};
+
+exports.networkInterfaces
+= exports.getNetworkInterfaces
+= function () { return {} };
+
+exports.arch = function () { return 'javascript' };
+
+exports.platform = function () { return 'browser' };
+
+exports.tmpdir = exports.tmpDir = function () {
+    return '/tmp';
+};
+
+exports.EOL = '\n';
+
+exports.homedir = function () {
+	return '/'
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/popper.js/dist/esm/popper.js":
 /*!***************************************************!*\
   !*** ./node_modules/popper.js/dist/esm/popper.js ***!
@@ -53319,7 +53398,6 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue2_google_maps__WEBPACK_IMPORTED_MODULE_1__, {
   load: {
-    // key: "{{ env('API_KEY') }}",
     key: "AIzaSyCqiZNO6bcyvPIrXnTk_SB6zjXqn2A1cf0",
     libraries: 'places'
   }
