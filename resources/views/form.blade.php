@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-<div id="app">
+<div id="app" v-cloak>
     <form-component></form-component>
 </div>
 

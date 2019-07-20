@@ -30,9 +30,11 @@
     </script>
 </head>
 <body>
+  <!--
   <div class="top-bar">
     <div class="top-bar-left">TravelMap</div>
   </div>
+  -->
   @yield('content')
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

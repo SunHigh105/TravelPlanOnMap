@@ -4233,6 +4233,27 @@ module.exports = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! os */ "./node_modules/os-browserify/browser.js");
 /* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(os__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var timers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! timers */ "./node_modules/timers-browserify/main.js");
+/* harmony import */ var timers__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(timers__WEBPACK_IMPORTED_MODULE_1__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -4326,7 +4347,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  // components: {
+  //     MapComponent
+  // },
   data: function data() {
     return {
       items: [{
@@ -4337,6 +4362,9 @@ __webpack_require__.r(__webpack_exports__);
       outputs: [],
       popupStyle: {
         "display": "block"
+      },
+      loaderStyle: {
+        "display": "none"
       },
       center: {
         lat: 35.6585805,
@@ -4415,8 +4443,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     calcTime: function calcTime(hour, minute, time) {
       var h = hour;
-      var m = minute + time; // console.log(h);
-      // console.log(m);
+      var m = minute + time;
 
       if (m >= 60) {
         h = h + Math.floor(m / 60);
@@ -4425,9 +4452,7 @@ __webpack_require__.r(__webpack_exports__);
 
       if (h >= 24) {
         h = h - 24;
-      } // console.log(h);
-      // console.log(m);
-
+      }
 
       return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
     },
@@ -4438,13 +4463,11 @@ __webpack_require__.r(__webpack_exports__);
       var fromTime = '';
       var toTime = '';
       this.items.forEach(function (item) {
-        // console.log(item);
         //目的地取得
         axios.post('api/place', {
           place: encodeURI(item.place)
         }).then(function (response) {
-          var results = response.data.results[0]; // fromTime = this.calcTime(this.hour, this.minute, totalTime);
-          // toTime = this.calcTime(this.hour, this.minute, totalTime);
+          var results = response.data.results[0]; //目的地を追加
 
           _this.outputs.push({
             index: item.index,
@@ -4452,10 +4475,9 @@ __webpack_require__.r(__webpack_exports__);
             place: item.place,
             time: item.time,
             lat: results.geometry.location.lat,
-            lng: results.geometry.location.lng // fromTime: fromTime,
-            // toTime: toTime,
+            lng: results.geometry.location.lng
+          }); //マーカーを追加
 
-          });
 
           _this.markers.push({
             position: {
@@ -4481,12 +4503,10 @@ __webpack_require__.r(__webpack_exports__);
         }); //移動時間・移動距離取得
 
         if (item.index >= 2) {
-          // console.log(this.items[item.index - 2].place);
           axios.post('api/route', {
             origin: encodeURI(_this.items[item.index - 2].place),
             destination: encodeURI(item.place)
           }).then(function (response) {
-            // console.log(response);
             // distanceとduration設定
             _this.$set(_this.outputs[item.index - 1], 'distance', response.data.routes[0].legs[0].distance.text);
 
@@ -4501,18 +4521,29 @@ __webpack_require__.r(__webpack_exports__);
             totalTime = totalTime + parseInt(item.time, 10);
 
             _this.$set(_this.outputs[item.index - 1], 'toTime', _this.calcTime(_this.hour, _this.minute, totalTime));
+          })["catch"](function (error) {
+            alert('移動経路が見つかりませんでした');
           });
         }
-      }); // console.log(this.center);
-
-      this.hiddenForm();
-    },
-    hiddenForm: function hiddenForm() {
-      this.popupStyle["display"] = "none";
+      });
+      this.dispLoader();
     },
     dispForm: function dispForm() {
       this.popupStyle["display"] = "block";
       this.outputs = [];
+      this.markers = [];
+    },
+    dispLoader: function dispLoader() {
+      //Loadingを3秒表示
+      this.loaderStyle["display"] = "block";
+      Object(timers__WEBPACK_IMPORTED_MODULE_1__["setTimeout"])(this.hiddenForm, 3000);
+      Object(timers__WEBPACK_IMPORTED_MODULE_1__["setTimeout"])(this.hiddenLoader, 3000);
+    },
+    hiddenForm: function hiddenForm() {
+      this.popupStyle["display"] = "none";
+    },
+    hiddenLoader: function hiddenLoader() {
+      this.loaderStyle["display"] = "none";
     }
   }
 });
@@ -4530,41 +4561,47 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      center: {
-        lat: 35.6585805,
-        lng: 139.7454329
-      },
-      zoom: 12
+      params: this.$parent.items
     };
   },
-  mounted: function mounted() {
-    this.getCenter();
+  created: function created() {
+    console.log(this.params);
   },
-  methods: {
-    getCenter: function getCenter() {}
-  } // computed:{
-  //     google: gmapApi
-  // }
+  // mounted(){
+  //     this.getParams();
+  // },
+  computed: {
+    getParams: function getParams() {
+      console.log(this.params);
+    }
+  },
+  watch: {
+    params: function params() {
+      console.log(this.params);
+    } // data(){
+    //     return{
+    //         center: {
+    //             lat:35.6585805, 
+    //             lng:139.7454329
+    //         },
+    //         zoom: 12,
+    //     }
+    // },
+    // mounted(){
+    //     this.getCenter();
+    // },
+    // methods:{
+    //     getCenter(){
+    //     }
+    // }
+    // computed:{
+    //     google: gmapApi
+    // }
 
+  }
 });
 
 /***/ }),
@@ -40866,340 +40903,355 @@ var render = function() {
     "div",
     { attrs: { id: "form-component" } },
     [
-      _c(
-        "GmapMap",
-        {
-          staticStyle: { width: "1000px", height: "400px" },
-          attrs: {
-            center: _vm.center,
-            zoom: _vm.zoom,
-            "map-type-id": "roadmap"
-          }
-        },
-        _vm._l(_vm.markers, function(m, index) {
-          return _c("GmapMarker", {
-            key: index,
-            attrs: {
-              position: m.position,
-              label: m.label,
-              clickable: true,
-              draggable: false
-            },
-            on: {
-              click: function($event) {
-                _vm.center = m.position
-              }
-            }
-          })
-        }),
-        1
-      ),
+      _c("div", { staticClass: "loading-bg", style: _vm.loaderStyle }, [
+        _c("div", [_vm._v("Searching...")])
+      ]),
       _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "container" },
-        [
-          _c("div", { style: _vm.popupStyle, attrs: { id: "popup-bg" } }, [
-            _c("div", { staticClass: "popup" }, [
-              _c("h3", [_vm._v("目的地の設定")]),
-              _vm._v(" "),
-              _c(
+      _c("div", { staticClass: "popup", style: _vm.popupStyle }, [
+        _c(
+          "div",
+          { staticClass: "grid-container" },
+          [
+            _c("h3", [_vm._v("目的地の設定")]),
+            _vm._v(" "),
+            _vm._l(_vm.items, function(item) {
+              return _c(
                 "div",
-                { staticClass: "grid-container" },
+                { key: item.index, staticClass: "grid-x grid-padding-x" },
                 [
-                  _vm._l(_vm.items, function(item) {
-                    return _c(
-                      "div",
-                      { key: item.index, staticClass: "grid-x grid-padding-x" },
-                      [
-                        _c("input", {
-                          attrs: { type: "hidden" },
-                          domProps: { value: item.index }
-                        }),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "cell medium-6" }, [
-                          _c("label", [
-                            _vm._v("目的地" + _vm._s(item.index)),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: item.place,
-                                  expression: "item.place"
-                                }
-                              ],
-                              staticClass: "place",
-                              attrs: { type: "text" },
-                              domProps: { value: item.place },
-                              on: {
-                                input: function($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.$set(item, "place", $event.target.value)
-                                }
-                              }
-                            })
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "cell medium-4" }, [
-                          _c("label", [
-                            _vm._v("滞在時間(分)"),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: item.time,
-                                  expression: "item.time"
-                                }
-                              ],
-                              staticClass: "time",
-                              attrs: {
-                                type: "number",
-                                min: "10",
-                                max: "2000",
-                                step: "10"
-                              },
-                              domProps: { value: item.time },
-                              on: {
-                                input: function($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.$set(item, "time", $event.target.value)
-                                }
-                              }
-                            })
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        item.index > 1 && item.index === _vm.items.length
-                          ? _c(
-                              "button",
-                              {
-                                staticClass: "button secondary",
-                                attrs: { id: "deleteForm" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.deleteForm()
-                                  }
-                                }
-                              },
-                              [_vm._v("Delete")]
-                            )
-                          : _vm._e()
-                      ]
-                    )
+                  _c("div", { staticClass: "cell medium-1" }),
+                  _vm._v(" "),
+                  _c("input", {
+                    attrs: { type: "hidden" },
+                    domProps: { value: item.index }
                   }),
                   _vm._v(" "),
-                  _c("div", { staticClass: "grid-x grid-padding-x" }, [
-                    _c("div", { staticClass: "cell medium-4" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "hollow button secondary",
-                          on: {
-                            click: function($event) {
-                              return _vm.addForm()
-                            }
+                  _c("div", { staticClass: "cell medium-6" }, [
+                    _c("label", [
+                      _vm._v("目的地" + _vm._s(item.index)),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: item.place,
+                            expression: "item.place"
                           }
-                        },
-                        [_vm._v("＋目的地を追加")]
-                      )
+                        ],
+                        attrs: { type: "text" },
+                        domProps: { value: item.place },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(item, "place", $event.target.value)
+                          }
+                        }
+                      })
                     ])
                   ]),
                   _vm._v(" "),
-                  _c("label", [_vm._v("出発時刻")]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "grid-x grid-padding-x" }, [
-                    _c("div", { staticClass: "cell medium-2" }, [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.hour,
-                              expression: "hour"
-                            }
-                          ],
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.hour = $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            }
+                  _c("div", { staticClass: "cell medium-3" }, [
+                    _c("label", [
+                      _vm._v("滞在時間(分)"),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: item.time,
+                            expression: "item.time"
                           }
+                        ],
+                        attrs: {
+                          type: "number",
+                          min: "10",
+                          max: "2000",
+                          step: "10"
                         },
-                        _vm._l(_vm.selectHour, function(hour) {
-                          return _c(
-                            "option",
-                            { key: hour.val, domProps: { value: hour.val } },
-                            [
-                              _vm._v(
-                                _vm._s(hour.disp) +
-                                  "\n                                "
-                              )
-                            ]
-                          )
-                        }),
-                        0
-                      )
-                    ]),
-                    _vm._v(
-                      "\n                        :\n                        "
-                    ),
-                    _c("div", { staticClass: "cell medium-2" }, [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.minute,
-                              expression: "minute"
+                        domProps: { value: item.time },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
                             }
-                          ],
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.minute = $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            }
+                            _vm.$set(item, "time", $event.target.value)
                           }
-                        },
-                        _vm._l(_vm.selectMinute, function(minute) {
-                          return _c(
-                            "option",
-                            {
-                              key: minute.val,
-                              domProps: { value: minute.val }
-                            },
-                            [
-                              _vm._v(
-                                _vm._s(minute.disp) +
-                                  "\n                                "
-                              )
-                            ]
-                          )
-                        }),
-                        0
-                      )
+                        }
+                      })
                     ])
                   ]),
                   _vm._v(" "),
+                  _c("div", { staticClass: "button-wrapper" }, [
+                    item.index > 1 && item.index === _vm.items.length
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "button secondary",
+                            attrs: { id: "delete-form" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteForm()
+                              }
+                            }
+                          },
+                          [_vm._v("Delete")]
+                        )
+                      : _vm._e()
+                  ])
+                ]
+              )
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "grid-x grid-padding-x" }, [
+              _c("div", { staticClass: "cell medium-12" }, [
+                _c("div", { staticClass: "button-wrapper" }, [
                   _c(
                     "button",
                     {
-                      staticClass: "button",
-                      attrs: { id: "search" },
+                      staticClass: "hollow button secondary add-button",
                       on: {
                         click: function($event) {
-                          return _vm.sendPlaces()
+                          return _vm.addForm()
                         }
                       }
                     },
-                    [_vm._v("Search")]
+                    [_vm._v("＋目的地を追加")]
                   )
-                ],
-                2
-              )
+                ])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "grid-x grid-padding-x start-time" }, [
+              _c("div", { staticClass: "cell medium-2" }),
+              _vm._v(" "),
+              _c("label", [_vm._v("出発時刻")]),
+              _vm._v(" "),
+              _c("div", { staticClass: "cell medium-2" }, [
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.hour,
+                        expression: "hour"
+                      }
+                    ],
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.hour = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  _vm._l(_vm.selectHour, function(hour) {
+                    return _c(
+                      "option",
+                      { key: hour.val, domProps: { value: hour.val } },
+                      [_vm._v(_vm._s(hour.disp) + "\n                        ")]
+                    )
+                  }),
+                  0
+                )
+              ]),
+              _vm._v("\n                :\n                "),
+              _c("div", { staticClass: "cell medium-2" }, [
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.minute,
+                        expression: "minute"
+                      }
+                    ],
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.minute = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  _vm._l(_vm.selectMinute, function(minute) {
+                    return _c(
+                      "option",
+                      { key: minute.val, domProps: { value: minute.val } },
+                      [
+                        _vm._v(
+                          _vm._s(minute.disp) + "\n                        "
+                        )
+                      ]
+                    )
+                  }),
+                  0
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "cell medium-3" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "button search-button",
+                    attrs: { id: "search" },
+                    on: {
+                      click: function($event) {
+                        return _vm.sendPlaces()
+                      }
+                    }
+                  },
+                  [_vm._v("Search")]
+                )
+              ])
             ])
-          ]),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "button",
-              on: {
-                click: function($event) {
-                  return _vm.dispForm()
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c(
+          "div",
+          { staticClass: "columns medium-8" },
+          [
+            _c(
+              "GmapMap",
+              {
+                attrs: {
+                  center: _vm.center,
+                  zoom: _vm.zoom,
+                  "map-type-id": "roadmap"
                 }
-              }
-            },
-            [_vm._v("Edit")]
-          ),
-          _vm._v(" "),
-          _vm._l(_vm.outputs, function(output) {
-            return _c("div", { key: output.index, attrs: { id: "list" } }, [
-              output.distance
-                ? _c("div", { staticClass: "card" }, [
-                    _c("div", { staticClass: "card-section" }, [
-                      _c("div", { staticClass: "distance" }, [
-                        _vm._v(_vm._s(output.distance))
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "duration" }, [
-                        _vm._v(_vm._s(output.duration))
+              },
+              _vm._l(_vm.markers, function(m, index) {
+                return _c("GmapMarker", {
+                  key: index,
+                  attrs: {
+                    position: m.position,
+                    label: m.label,
+                    clickable: true,
+                    draggable: false
+                  },
+                  on: {
+                    click: function($event) {
+                      _vm.center = m.position
+                    }
+                  }
+                })
+              }),
+              1
+            )
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "columns medium-4 place-list" },
+          [
+            _c("div", { staticClass: "button-wrapper" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "button search-button",
+                  on: {
+                    click: function($event) {
+                      return _vm.dispForm()
+                    }
+                  }
+                },
+                [_vm._v("Edit")]
+              )
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.outputs, function(output) {
+              return _c("div", { key: output.index, attrs: { id: "list" } }, [
+                output.distance
+                  ? _c("div", { staticClass: "card" }, [
+                      _c("div", { staticClass: "card-section" }, [
+                        _c("div", { staticClass: "distance" }, [
+                          _vm._v(
+                            _vm._s(output.duration) +
+                              " (" +
+                              _vm._s(output.distance) +
+                              ")"
+                          )
+                        ])
                       ])
                     ])
-                  ])
-                : _vm._e(),
-              _vm._v(" "),
-              _c("div", { staticClass: "card" }, [
-                _c("div", { staticClass: "card-divider grid-x" }, [
-                  _c("div", { staticClass: "place cell medium-9" }, [
-                    _c("p", {}, [
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-divider grid-x" }, [
+                    _c("div", { staticClass: "place cell medium-8" }, [
                       _vm._v(
-                        "【" +
+                        "\n                            【" +
                           _vm._s(output.index) +
                           "】 " +
-                          _vm._s(output.place)
+                          _vm._s(output.place) +
+                          "\n                        "
                       )
                     ]),
                     _vm._v(" "),
-                    _c("span", [
+                    _c("div", { staticClass: "place cell medium-4" }, [
                       _vm._v(
-                        _vm._s(output.fromTime) + " ~ " + _vm._s(output.toTime)
+                        "\n                            " +
+                          _vm._s(output.fromTime) +
+                          " ~ " +
+                          _vm._s(output.toTime) +
+                          "\n                        "
                       )
                     ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "card-section" }, [
-                  _c("p", {}, [_vm._v("住所：" + _vm._s(output.address))]),
-                  _vm._v(" "),
-                  _c("p", {}, [
-                    _vm._v("滞在時間：" + _vm._s(output.time) + "分")
                   ]),
                   _vm._v(" "),
-                  _c("input", {
-                    attrs: { name: "lat", type: "hidden" },
-                    domProps: { value: output.lat }
-                  }),
-                  _vm._v(" "),
-                  _c("input", {
-                    attrs: { name: "lng", type: "hidden" },
-                    domProps: { value: output.lng }
-                  })
+                  _c("div", { staticClass: "card-section" }, [
+                    _c("p", [_vm._v("住所：" + _vm._s(output.address))]),
+                    _vm._v(" "),
+                    _c("p", [
+                      _vm._v("滞在時間：" + _vm._s(output.time) + "分")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      attrs: { name: "lat", type: "hidden" },
+                      domProps: { value: output.lat }
+                    }),
+                    _vm._v(" "),
+                    _c("input", {
+                      attrs: { name: "lng", type: "hidden" },
+                      domProps: { value: output.lng }
+                    })
+                  ])
                 ])
               ])
-            ])
-          })
-        ],
-        2
-      )
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _c("map-component")
     ],
     1
   )
@@ -41226,10 +41278,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("GmapMap", {
-    staticStyle: { width: "1000px", height: "400px" },
-    attrs: { center: _vm.center, zoom: _vm.zoom, "map-type-id": "roadmap" }
-  })
+  return _c("div")
 }
 var staticRenderFns = []
 render._withStripped = true
