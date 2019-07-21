@@ -19,7 +19,7 @@ h3{
 .grid-container{
     padding-top: 1.5rem;
     width: 70%;
-    border: 1px solid rgba(0,0,0,.0975);
+    /* border: 1px solid rgba(0,0,0,.0975); */
 }
 
 .add-button{
@@ -50,6 +50,16 @@ h3{
     margin: 1.5em 0 0 0;
     float: right;
     height: 3em;
+}
+
+/* model plan list*/
+.plan-title{
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.plan-title:hover{
+    text-decoration-line: underline;
 }
 
 /* loading */

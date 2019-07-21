@@ -41,4 +41,18 @@ class PlanController extends Controller
             ]);
         }
     }
+
+    public function showPlan(){
+        $plans = DB::table('plan')->orderBy('id','desc')->get();
+        logger($plans);
+        return $plans;
+    }
+
+    public function getPlaces(Request $request){
+        $places = DB::table('place')
+                    ->where('plan_id', $request->input('plan_id'))
+                    ->orderBy('id', 'asc')->get();
+        logger($places);
+        return $places;
+    }
 }

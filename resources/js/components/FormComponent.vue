@@ -7,49 +7,67 @@
     <!--input form-->
     <div class="popup" v-bind:style="popupStyle">
         <div class="grid-container">
-            <h3>目的地の設定</h3>
-            <div class="grid-x grid-padding-x" v-for="item in items" v-bind:key="item.index">
-                <div class="cell medium-1"></div>
-                <input type="hidden" :value="item.index">
-                <div class="cell medium-6">
-                    <label>目的地{{ item.index }}<input type="text" v-model="item.place"></label>
-                </div>
-                <div class="cell medium-3">
-                    <label>滞在時間(分)<input type="number" min=10 max=2000 step=10 v-model="item.time"></label>
-                </div>
-                <div class="button-wrapper">
-                    <button v-if="item.index > 1 && item.index === items.length" id="delete-form" class="button secondary" v-on:click="deleteForm()">Delete</button>
-                </div>
-            </div>
-            <div class="grid-x grid-padding-x">
-                <div class="cell medium-12">
-                    <div class="button-wrapper">
-                        <button class="hollow button secondary add-button" v-on:click="addForm()">＋目的地を追加</button>
+            <ul class="tabs" data-tabs id="example-tabs">
+                <li class="tabs-title is-active"><a href="#input-form" aria-selected="true">目的地の設定</a></li>
+                <li class="tabs-title" v-on:click="showPlan()"><a href="#plan-list">モデルプラン</a></li>
+            </ul>
+            <!--<h3>目的地の設定</h3>-->
+            <div class="tabs-content" data-tabs-content="example-tabs">
+                <div class="tabs-panel is-active" id="input-form">
+                    <div class="grid-x grid-padding-x" v-for="item in items" v-bind:key="item.index">
+                        <div class="cell medium-1"></div>
+                        <input type="hidden" :value="item.index">
+                        <div class="cell medium-6">
+                            <label>目的地{{ item.index }}<input type="text" v-model="item.place"></label>
+                        </div>
+                        <div class="cell medium-3">
+                            <label>滞在時間(分)<input type="number" min=10 max=2000 step=10 v-model="item.time"></label>
+                        </div>
+                        <div class="button-wrapper">
+                            <button v-if="item.index > 1 && item.index === items.length" id="delete-form" class="button secondary" v-on:click="deleteForm()">Delete</button>
+                        </div>
+                    </div>
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell medium-12">
+                            <div class="button-wrapper">
+                                <button class="hollow button secondary add-button" v-on:click="addForm()">＋目的地を追加</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-x grid-padding-x start-time">
+                        <div class="cell medium-2"></div>
+                        <label>出発時刻</label>
+                        <div class="cell medium-2">
+                            <select v-model="hour">
+                                <option v-for="hour in selectHour" 
+                                v-bind:key="hour.val" 
+                                v-bind:value="hour.val">{{ hour.disp }}
+                                </option>
+                            </select>
+                        </div>
+                        :
+                        <div class="cell medium-2">
+                            <select v-model="minute">
+                                <option v-for="minute in selectMinute" 
+                                v-bind:key="minute.val" 
+                                v-bind:value="minute.val">{{ minute.disp }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="cell medium-3">
+                            <button id="search" class="button search-button" v-on:click="sendPlaces()">Search</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="grid-x grid-padding-x start-time">
-                <div class="cell medium-2"></div>
-                <label>出発時刻</label>
-                <div class="cell medium-2">
-                    <select v-model="hour">
-                        <option v-for="hour in selectHour" 
-                        v-bind:key="hour.val" 
-                        v-bind:value="hour.val">{{ hour.disp }}
-                        </option>
-                    </select>
-                </div>
-                :
-                <div class="cell medium-2">
-                    <select v-model="minute">
-                        <option v-for="minute in selectMinute" 
-                        v-bind:key="minute.val" 
-                        v-bind:value="minute.val">{{ minute.disp }}
-                        </option>
-                    </select>
-                </div>
-                <div class="cell medium-3">
-                    <button id="search" class="button search-button" v-on:click="sendPlaces()">Search</button>
+                <div class="tabs-panel grid-x grid-padding-x" id="plan-list">
+                    <div v-for="plan in plans" v-bind:key="plan.id">
+                        <div class="card cell medium-8">
+                            <div class="card-section grid-x">
+                                <div class="cell medium-8 plan-title" v-on:click="getPlanDetail(plan.id)">{{ plan.plan_title }}</div>
+                                <div class="cell medium-4">{{ plan.created_at }}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -81,7 +99,6 @@
             <label>プラン名</label>
             <input type="text" v-model="title">
             <button class="button search-button" v-on:click="registPlan()">Regist</button>
-            <!--<div>【出発時刻】 {{ String(hour).padStart(2, '0') }} : {{ String(minute).padStart(2, '0') }}</div>-->
             <div id="list" v-for="output in outputs" v-bind:key="output.index">
                 <div class="card" v-if="output.distance">
                     <div class="card-section">
@@ -126,6 +143,7 @@ export default {
                 place: '',
                 time: '',
             }],
+            plans: [],
             outputs:[],
             popupStyle: {
                 "display": "block" 
@@ -141,8 +159,8 @@ export default {
             markers: [],
             selectHour:[],
             selectMinute:[],
-            hour:'',
-            minute:'',
+            hour: 9,
+            minute: 0,
             title: '',
         }
     },
@@ -226,6 +244,7 @@ export default {
                     place: encodeURI(item.place)
                 }).then((response) => {
                     var results = response.data.results[0];
+                    console.log(response.data);
                     //目的地を追加
                     this.outputs.push({
                         index: item.index,
@@ -318,10 +337,58 @@ export default {
             }).catch((error) => {
                 alert('プランの登録に失敗しました...');
             });
-
+            //入力値リセット
+            this.resetForm();
             //入力画面に戻す
             this.dispForm();
+        },
+        resetForm(){
+            this.items = {
+                index: 1,
+                place: '',
+                time: '',
+            };
+            this.hour = 9;
+            this.minute = 0;
+            this.title = '';
+        },
+        showPlan(){
+            axios.post('api/showPlan', this.items).then((response) => {
+                this.plans = response.data;
+            }).catch((error) => {
+                alert('プランの取得に失敗しました。');
+            });
+        },
+        getPlanDetail(id){
+            //item配列をリセット
+            this.items = [];
+            //idからplace取得
+            axios.post('api/getPlaces/', {plan_id: id})
+            .then((response) => {
+                var params = response.data;
+                //item設定
+                params.forEach(param => {
+                    this.items.push({
+                        index: this.items.length + 1,
+                        place: param.place,
+                        time: param.time,
+                    });
+                });
+                // タイトルと出発時刻設定
+                this.plans.forEach(plan => {
+                    if(plan.id === id){
+                        this.hour = plan.start_time_h;
+                        this.minute = plan.start_time_m;
+                        this.title = plan.plan_title;
+                    }
+                });
+                //placeList表示
+                this.createPlaceLists();
+            }).catch((error) => {
+                alert('お探しのプランが見つかりませんでした。');
+            });
         }
+
     }
 }
 </script>

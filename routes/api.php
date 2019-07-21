@@ -20,3 +20,5 @@ Route::post('/place', 'RouteController@place');
 Route::post('/route', 'RouteController@route');
 Route::post('/registPlan', 'PlanController@registPlan');
 Route::post('/registPlace', 'PlanController@registPlace');
+Route::post('/showPlan', 'PlanController@showPlan');
+Route::post('/getPlaces', 'PlanController@getPlaces');
