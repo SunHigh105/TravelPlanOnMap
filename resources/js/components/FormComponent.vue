@@ -78,6 +78,9 @@
             <div class="button-wrapper">
                 <button class="button search-button" v-on:click="dispForm()">Edit</button>
             </div>
+            <label>プラン名</label>
+            <input type="text" v-model="title">
+            <button class="button search-button" v-on:click="registPlan()">Regist</button>
             <!--<div>【出発時刻】 {{ String(hour).padStart(2, '0') }} : {{ String(minute).padStart(2, '0') }}</div>-->
             <div id="list" v-for="output in outputs" v-bind:key="output.index">
                 <div class="card" v-if="output.distance">
@@ -140,6 +143,7 @@ export default {
             selectMinute:[],
             hour:'',
             minute:'',
+            title: '',
         }
     },
     mounted() {
@@ -291,6 +295,32 @@ export default {
         },
         hiddenLoader(){
             this.loaderStyle["display"] = "none";
+        },
+        registPlan(){
+            //プラン名の入力チェック
+            if(this.title === ''){
+                alert('プラン名を入力してください！');
+                return false;
+            }
+            //プランの登録
+            axios.post('api/registPlan', {
+                plan_title: this.title,
+                hour: this.hour,
+                minute: this.minute
+            }).then((response) => {
+                //alert('プランの登録に成功しました！');
+            }).catch((error) => {
+                alert('プランの登録に失敗しました...');
+            });
+            //目的地の登録
+            axios.post('api/registPlace', this.items).then((response) => {
+                alert('プランの登録に成功しました！');
+            }).catch((error) => {
+                alert('プランの登録に失敗しました...');
+            });
+
+            //入力画面に戻す
+            this.dispForm();
         }
     }
 }

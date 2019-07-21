@@ -4346,6 +4346,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -4375,7 +4378,8 @@ __webpack_require__.r(__webpack_exports__);
       selectHour: [],
       selectMinute: [],
       hour: '',
-      minute: ''
+      minute: '',
+      title: ''
     };
   },
   mounted: function mounted() {
@@ -4544,6 +4548,31 @@ __webpack_require__.r(__webpack_exports__);
     },
     hiddenLoader: function hiddenLoader() {
       this.loaderStyle["display"] = "none";
+    },
+    registPlan: function registPlan() {
+      //プラン名の入力チェック
+      if (this.title === '') {
+        alert('プラン名を入力してください！');
+        return false;
+      } //プランの登録
+
+
+      axios.post('api/registPlan', {
+        plan_title: this.title,
+        hour: this.hour,
+        minute: this.minute
+      }).then(function (response) {//alert('プランの登録に成功しました！');
+      })["catch"](function (error) {
+        alert('プランの登録に失敗しました...');
+      }); //目的地の登録
+
+      axios.post('api/registPlace', this.items).then(function (response) {
+        alert('プランの登録に成功しました！');
+      })["catch"](function (error) {
+        alert('プランの登録に失敗しました...');
+      }); //入力画面に戻す
+
+      this.dispForm();
     }
   }
 });
@@ -41185,6 +41214,42 @@ var render = function() {
                 [_vm._v("Edit")]
               )
             ]),
+            _vm._v(" "),
+            _c("label", [_vm._v("プラン名")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.title,
+                  expression: "title"
+                }
+              ],
+              attrs: { type: "text" },
+              domProps: { value: _vm.title },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.title = $event.target.value
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "button search-button",
+                on: {
+                  click: function($event) {
+                    return _vm.registPlan()
+                  }
+                }
+              },
+              [_vm._v("Regist")]
+            ),
             _vm._v(" "),
             _vm._l(_vm.outputs, function(output) {
               return _c("div", { key: output.index, attrs: { id: "list" } }, [
