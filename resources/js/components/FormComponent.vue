@@ -1,45 +1,42 @@
 <template>
 <div id="form-component">
-    <!--地図-->
-    <GmapMap
-    :center="center"
-    :zoom="zoom"
-    map-type-id="roadmap"
-    style="width: 1000px; height: 400px"
-    >
-        <GmapMarker
-            :key="index"
-            v-for="(m, index) in markers"
-            :position="m.position"
-            :label="m.label"
-            :clickable="true"
-            :draggable="false"
-            @click="center=m.position"
-        />
-    </GmapMap>
-    <div class="container">
-        <!--目的地入力-->
-        <div id="popup-bg" v-bind:style="popupStyle">
-            <div class="popup">
-                <h3>目的地の設定</h3>
-                <div class="grid-container">
+    <!--loading-->
+    <div class="loading-bg" v-bind:style="loaderStyle">
+        <div>Searching...</div>
+    </div>
+    <!--input form-->
+    <div class="popup" v-bind:style="popupStyle">
+        <div class="grid-container">
+            <ul class="tabs" data-tabs id="example-tabs">
+                <li class="tabs-title is-active"><a href="#input-form" aria-selected="true">目的地の設定</a></li>
+                <li class="tabs-title" v-on:click="showPlan()"><a href="#plan-list">モデルプラン</a></li>
+            </ul>
+            <!--<h3>目的地の設定</h3>-->
+            <div class="tabs-content" data-tabs-content="example-tabs">
+                <div class="tabs-panel is-active" id="input-form">
                     <div class="grid-x grid-padding-x" v-for="item in items" v-bind:key="item.index">
+                        <div class="cell medium-1"></div>
                         <input type="hidden" :value="item.index">
                         <div class="cell medium-6">
-                            <label>目的地{{ item.index }}<input type="text" class="place" v-model="item.place"></label>
+                            <label>目的地{{ item.index }}<input type="text" v-model="item.place"></label>
                         </div>
-                        <div class="cell medium-4">
-                            <label>滞在時間(分)<input type="number" class="time" min=10 max=2000 step=10 v-model="item.time"></label>
+                        <div class="cell medium-3">
+                            <label>滞在時間(分)<input type="number" min=10 max=2000 step=10 v-model="item.time"></label>
                         </div>
-                        <button v-if="item.index > 1 && item.index === items.length" id="deleteForm" class="button secondary" v-on:click="deleteForm()">Delete</button>
-                    </div>
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell medium-4">
-                            <button class="hollow button secondary" v-on:click="addForm()">＋目的地を追加</button>
+                        <div class="button-wrapper">
+                            <button v-if="item.index > 1 && item.index === items.length" id="delete-form" class="button secondary" v-on:click="deleteForm()">Delete</button>
                         </div>
                     </div>
-                    <label>出発時刻</label>
                     <div class="grid-x grid-padding-x">
+                        <div class="cell medium-12">
+                            <div class="button-wrapper">
+                                <button class="hollow button secondary add-button" v-on:click="addForm()">＋目的地を追加</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-x grid-padding-x start-time">
+                        <div class="cell medium-2"></div>
+                        <label>出発時刻</label>
                         <div class="cell medium-2">
                             <select v-model="hour">
                                 <option v-for="hour in selectHour" 
@@ -57,38 +54,88 @@
                                 </option>
                             </select>
                         </div>
+                        <div class="cell medium-3">
+                            <button id="search" class="button search-button" v-on:click="sendPlaces()">Search</button>
+                        </div>
                     </div>
-                    <button id="search" class="button" v-on:click="sendPlaces()">Search</button>
                 </div>
-            </div>
-        </div>
-        <!--目的地リスト表示-->
-        <button class="button" v-on:click="dispForm()">Edit</button>
-        <div id="list" v-for="output in outputs" v-bind:key="output.index">
-            <div class="card" v-if="output.distance">
-                <div class="card-section">
-                    <div class="distance">{{ output.distance }}</div>
-                    <div class="duration">{{ output.duration }}</div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-divider grid-x" >
-                    <div class="place cell medium-9"><p v-cloak>【{{ output.index }}】 {{ output.place }}</p></div>
-                </div>
-                <div class="card-section">
-                    <p v-cloak>住所：{{ output.address }}</p>
-                    <p v-cloak>滞在時間：{{ output.time }}分</p>
-                    <input name="lat" type="hidden" :value="output.lat">
-                    <input name="lng" type="hidden" :value="output.lng">
+                <div class="tabs-panel grid-x grid-padding-x" id="plan-list">
+                    <div v-for="plan in plans" v-bind:key="plan.id">
+                        <div class="card cell medium-8">
+                            <div class="card-section grid-x">
+                                <div class="cell medium-8 plan-title" v-on:click="getPlanDetail(plan.id)">{{ plan.plan_title }}</div>
+                                <div class="cell medium-4">{{ plan.created_at }}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="row">
+        <!--map-->
+        <div class="columns medium-8">
+            <GmapMap
+            :center="center"
+            :zoom="zoom"
+            map-type-id="roadmap"
+            >
+                <GmapMarker
+                    :key="index"
+                    v-for="(m, index) in markers"
+                    :position="m.position"
+                    :label="m.label"
+                    :clickable="true"
+                    :draggable="false"
+                    @click="center=m.position"
+                />
+            </GmapMap>
+        </div>
+        <!--place list-->
+        <div class="columns medium-4 place-list">
+            <div class="button-wrapper">
+                <button class="button search-button" v-on:click="dispForm()">Edit</button>
+            </div>
+            <label>プラン名</label>
+            <input type="text" v-model="title">
+            <button class="button search-button" v-on:click="registPlan()">Regist</button>
+            <div id="list" v-for="output in outputs" v-bind:key="output.index">
+                <div class="card" v-if="output.distance">
+                    <div class="card-section">
+                        <div class="distance">{{ output.duration }} ({{ output.distance }})</div>
+                        <!--<div class="duration"></div>-->
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-divider grid-x" >
+                        <div class="place cell medium-8">
+                            【{{ output.index }}】 {{ output.place }}
+                        </div>
+                        <div class="place cell medium-4">
+                            {{ output.fromTime }} ~ {{ output.toTime }}
+                        </div>
+                    </div>
+                    <div class="card-section">
+                        <p>住所：{{ output.address }}</p>
+                        <p>滞在時間：{{ output.time }}分</p>
+                        <input name="lat" type="hidden" :value="output.lat">
+                        <input name="lng" type="hidden" :value="output.lng">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <map-component></map-component>
 </div>
 </template>
 
 <script>
+import { totalmem } from 'os';
+import { setTimeout } from 'timers';
 export default {
+    // components: {
+    //     MapComponent
+    // },
     data(){
         return{
             items: [{
@@ -96,9 +143,13 @@ export default {
                 place: '',
                 time: '',
             }],
+            plans: [],
             outputs:[],
             popupStyle: {
                 "display": "block" 
+            },
+            loaderStyle: {
+                "display": "none" 
             },
             center: {
                 lat:35.6585805, 
@@ -108,8 +159,9 @@ export default {
             markers: [],
             selectHour:[],
             selectMinute:[],
-            hour:'',
-            minute:'',
+            hour: 9,
+            minute: 0,
+            title: '',
         }
     },
     mounted() {
@@ -170,14 +222,30 @@ export default {
                 alert(e);
             }
         },
+        calcTime(hour, minute, time){
+            var h = hour;
+            var m = minute + time;
+            if(m >= 60){
+                h = h + Math.floor(m / 60);
+                m = m % 60;
+            }
+            if(h >= 24){
+                h = h - 24;
+            }
+            return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
+        },
         createPlaceLists(){
+            var totalTime = 0;
+            var fromTime = '';
+            var toTime = '';
             this.items.forEach(item => {
-                console.log(item);
                 //目的地取得
                 axios.post('api/place', {
                     place: encodeURI(item.place)
                 }).then((response) => {
                     var results = response.data.results[0];
+                    console.log(response.data);
+                    //目的地を追加
                     this.outputs.push({
                         index: item.index,
                         address: results.formatted_address,
@@ -186,6 +254,7 @@ export default {
                         lat: results.geometry.location.lat,
                         lng: results.geometry.location.lng,
                     });
+                    //マーカーを追加
                     this.markers.push({
                         position: {
                             lat: results.geometry.location.lat,
@@ -197,31 +266,129 @@ export default {
                         //地図の中心
                         this.center.lat = results.geometry.location.lat;
                         this.center.lng = results.geometry.location.lng;
+                        //fromTimeとtoTimeを設定
+                        this.$set(this.outputs[item.index - 1], 'fromTime', this.calcTime(this.hour, this.minute, totalTime));
+                        totalTime = totalTime + parseInt(item.time, 10);
+                        this.$set(this.outputs[item.index - 1], 'toTime', this.calcTime(this.hour, this.minute, totalTime));
                     }
                     
+                }).catch((error) => {
+                    alert('目的地が見つかりませんでした');
                 });
                 //移動時間・移動距離取得
                 if(item.index >= 2){
-                    // console.log(this.items[item.index - 2].place);
                     axios.post('api/route', {
                         origin: encodeURI(this.items[item.index - 2].place),
                         destination: encodeURI(item.place)
                     }).then((response) => {
+                        // distanceとduration設定
                         this.$set(this.outputs[item.index - 1], 'distance', response.data.routes[0].legs[0].distance.text);
                         this.$set(this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text);
+                        // 移動時間を分に変換
+                        var duration = response.data.routes[0].legs[0].duration.value;
+                        totalTime = totalTime + Math.floor(duration / 60); 
+                        //fromTimeとtoTimeを設定
+                        this.$set(this.outputs[item.index - 1], 'fromTime', this.calcTime(this.hour, this.minute, totalTime));
+                        totalTime = totalTime + parseInt(item.time, 10);
+                        this.$set(this.outputs[item.index - 1], 'toTime', this.calcTime(this.hour, this.minute, totalTime));
+                    }).catch((error) => {
+                        alert('移動経路が見つかりませんでした');
                     });
                 }
             }); 
-            console.log(this.center);
-            this.hiddenForm();
-        },
-        hiddenForm(){
-            this.popupStyle["display"] = "none";
+            this.dispLoader();
         },
         dispForm(){
             this.popupStyle["display"] = "block";
             this.outputs = [];
+            this.markers = [];
+        },
+        dispLoader(){
+            //Loadingを3秒表示
+            this.loaderStyle["display"] = "block";
+            setTimeout(this.hiddenForm, 3000);
+            setTimeout(this.hiddenLoader, 3000);
+        },
+        hiddenForm(){
+            this.popupStyle["display"] = "none";
+        },
+        hiddenLoader(){
+            this.loaderStyle["display"] = "none";
+        },
+        registPlan(){
+            //プラン名の入力チェック
+            if(this.title === ''){
+                alert('プラン名を入力してください！');
+                return false;
+            }
+            //プランの登録
+            axios.post('api/registPlan', {
+                plan_title: this.title,
+                hour: this.hour,
+                minute: this.minute
+            }).then((response) => {
+                //alert('プランの登録に成功しました！');
+            }).catch((error) => {
+                alert('プランの登録に失敗しました...');
+            });
+            //目的地の登録
+            axios.post('api/registPlace', this.items).then((response) => {
+                alert('プランの登録に成功しました！');
+            }).catch((error) => {
+                alert('プランの登録に失敗しました...');
+            });
+            //入力値リセット
+            this.resetForm();
+            //入力画面に戻す
+            this.dispForm();
+        },
+        resetForm(){
+            this.items = {
+                index: 1,
+                place: '',
+                time: '',
+            };
+            this.hour = 9;
+            this.minute = 0;
+            this.title = '';
+        },
+        showPlan(){
+            axios.post('api/showPlan', this.items).then((response) => {
+                this.plans = response.data;
+            }).catch((error) => {
+                alert('プランの取得に失敗しました。');
+            });
+        },
+        getPlanDetail(id){
+            //item配列をリセット
+            this.items = [];
+            //idからplace取得
+            axios.post('api/getPlaces/', {plan_id: id})
+            .then((response) => {
+                var params = response.data;
+                //item設定
+                params.forEach(param => {
+                    this.items.push({
+                        index: this.items.length + 1,
+                        place: param.place,
+                        time: param.time,
+                    });
+                });
+                // タイトルと出発時刻設定
+                this.plans.forEach(plan => {
+                    if(plan.id === id){
+                        this.hour = plan.start_time_h;
+                        this.minute = plan.start_time_m;
+                        this.title = plan.plan_title;
+                    }
+                });
+                //placeList表示
+                this.createPlaceLists();
+            }).catch((error) => {
+                alert('お探しのプランが見つかりませんでした。');
+            });
         }
+
     }
 }
 </script>

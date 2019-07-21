@@ -1,13 +1,7 @@
 @extends('layout')
 
 @section('content')
-<!--<div id="map"></div>-->
-<div id="app">
-    <!--<map-component></map-component>
-    <div class="container">
-        
-    </div>
-    -->
+<div id="app" v-cloak>
     <form-component></form-component>
 </div>
 

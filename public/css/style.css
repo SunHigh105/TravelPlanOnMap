@@ -1,59 +1,69 @@
-#map {
-    height: 60%;
-    width: 100%;
-}
 /* Optional: Makes the sample page fill the window. */
+
+/* common */
 html, body {
     height: 100%;
     margin: 0 auto;
-    padding: 0;
     overflow-x: hidden;
-}
-
-h3{
-    text-align: center;
 }
 
 [v-cloak]{
     display: none;
 }
 
-.top-bar{
-    background-color: #8bcc7c;
+/* input form*/
+h3{
+    text-align: center;
 }
 
-.container{
-    padding-top: 20px;
+.grid-container{
+    padding-top: 1.5rem;
+    width: 70%;
+    /* border: 1px solid rgba(0,0,0,.0975); */
 }
 
-#searchForm{
-    margin: 0 30px;
+.add-button{
+    width: 20rem;
+}
+
+.search-button{
+    width:  10rem;
+}
+
+.button-wrapper{
+    text-align: center;
 }
 
 .card{
-    width: 80%;
+    width: 450px;
 }
 
-.card-divider{
+.start-time{
+    padding: 2rem;
+}
+
+.start-time label{
     padding: 0.5rem;
 }
 
-.place p{
-    font-size: 1.2rem;
-    margin: 1rem 0 0 0;
-}
-
-#search{
-    margin: 1.3rem 0;
-}
-
-.deleteButton{
-    margin: 0.5rem 0 0 0;
+#delete-form{
+    margin: 1.5em 0 0 0;
     float: right;
+    height: 3em;
 }
 
-/* popup */
-#popup-bg{
+/* model plan list*/
+.plan-title{
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.plan-title:hover{
+    text-decoration-line: underline;
+}
+
+/* loading */
+.loading-bg{
     /* display: none; */
     /* display: block; */
     background-color: rgba(0, 0, 0, 0.5);
@@ -61,15 +71,70 @@ h3{
     right: 0;
     top:0;
     bottom: 0;
-    z-index: 1;
-    position: fixed;
+    z-index: 2;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
 }
 
+.loading-bg div{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    -webkit-transform: translateY(-50%) translateX(-50%);
+    color: #fff;
+    font-size: 1.5rem; 
+}
+/* popup */
 .popup{
-    margin-top: 10vh;
-    height: 80vh;
+    left: 0;
+    right: 0;
+    top:0;
+    bottom: 0;
+    z-index: 1;
+    position: fixed;
+    height: 100vh;
     padding: 3vh 7vh;
     vertical-align: middle;
     background: #fff;
     border: 1px solid rgba(0,0,0,.0975);
+    overflow: scroll;
 }
+
+
+/*place-list*/
+.place-list{
+    padding: 30px 40px;
+    height: 100vh;
+    overflow: scroll;
+}
+.card-divider{
+    padding: 0.5rem;
+}
+
+.place{
+    margin: 0.5rem 0 0 0;
+}
+
+.vue-map-container{
+    width: 800px;
+    height: 100vh;
+}
+
+/*Map size*/
+/*for tablet */
+/* @media (min-width: 768px){
+    .vue-map-container{
+        width: 700px;
+        height: 100vh;
+    }
+}
+
+@media (min-width: 375px){
+    .vue-map-container{
+        width: 500px;
+        height: 50vh;
+
+    }
+} */
