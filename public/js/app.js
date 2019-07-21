@@ -4231,6 +4231,10 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! os */ "./node_modules/os-browserify/browser.js");
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(os__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var timers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! timers */ "./node_modules/timers-browserify/main.js");
+/* harmony import */ var timers__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(timers__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -4320,7 +4324,54 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  // components: {
+  //     MapComponent
+  // },
   data: function data() {
     return {
       items: [{
@@ -4328,9 +4379,13 @@ __webpack_require__.r(__webpack_exports__);
         place: '',
         time: ''
       }],
+      plans: [],
       outputs: [],
       popupStyle: {
         "display": "block"
+      },
+      loaderStyle: {
+        "display": "none"
       },
       center: {
         lat: 35.6585805,
@@ -4340,8 +4395,9 @@ __webpack_require__.r(__webpack_exports__);
       markers: [],
       selectHour: [],
       selectMinute: [],
-      hour: '',
-      minute: ''
+      hour: 9,
+      minute: 0,
+      title: ''
     };
   },
   mounted: function mounted() {
@@ -4407,16 +4463,34 @@ __webpack_require__.r(__webpack_exports__);
         alert(e);
       }
     },
+    calcTime: function calcTime(hour, minute, time) {
+      var h = hour;
+      var m = minute + time;
+
+      if (m >= 60) {
+        h = h + Math.floor(m / 60);
+        m = m % 60;
+      }
+
+      if (h >= 24) {
+        h = h - 24;
+      }
+
+      return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
+    },
     createPlaceLists: function createPlaceLists() {
       var _this = this;
 
+      var totalTime = 0;
+      var fromTime = '';
+      var toTime = '';
       this.items.forEach(function (item) {
-        console.log(item); //目的地取得
-
+        //目的地取得
         axios.post('api/place', {
           place: encodeURI(item.place)
         }).then(function (response) {
           var results = response.data.results[0];
+          console.log(response.data); //目的地を追加
 
           _this.outputs.push({
             index: item.index,
@@ -4425,7 +4499,8 @@ __webpack_require__.r(__webpack_exports__);
             time: item.time,
             lat: results.geometry.location.lat,
             lng: results.geometry.location.lng
-          });
+          }); //マーカーを追加
+
 
           _this.markers.push({
             position: {
@@ -4438,31 +4513,139 @@ __webpack_require__.r(__webpack_exports__);
           if (item.index === 1) {
             //地図の中心
             _this.center.lat = results.geometry.location.lat;
-            _this.center.lng = results.geometry.location.lng;
+            _this.center.lng = results.geometry.location.lng; //fromTimeとtoTimeを設定
+
+            _this.$set(_this.outputs[item.index - 1], 'fromTime', _this.calcTime(_this.hour, _this.minute, totalTime));
+
+            totalTime = totalTime + parseInt(item.time, 10);
+
+            _this.$set(_this.outputs[item.index - 1], 'toTime', _this.calcTime(_this.hour, _this.minute, totalTime));
           }
+        })["catch"](function (error) {
+          alert('目的地が見つかりませんでした');
         }); //移動時間・移動距離取得
 
         if (item.index >= 2) {
-          // console.log(this.items[item.index - 2].place);
           axios.post('api/route', {
             origin: encodeURI(_this.items[item.index - 2].place),
             destination: encodeURI(item.place)
           }).then(function (response) {
+            // distanceとduration設定
             _this.$set(_this.outputs[item.index - 1], 'distance', response.data.routes[0].legs[0].distance.text);
 
-            _this.$set(_this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text);
+            _this.$set(_this.outputs[item.index - 1], 'duration', response.data.routes[0].legs[0].duration.text); // 移動時間を分に変換
+
+
+            var duration = response.data.routes[0].legs[0].duration.value;
+            totalTime = totalTime + Math.floor(duration / 60); //fromTimeとtoTimeを設定
+
+            _this.$set(_this.outputs[item.index - 1], 'fromTime', _this.calcTime(_this.hour, _this.minute, totalTime));
+
+            totalTime = totalTime + parseInt(item.time, 10);
+
+            _this.$set(_this.outputs[item.index - 1], 'toTime', _this.calcTime(_this.hour, _this.minute, totalTime));
+          })["catch"](function (error) {
+            alert('移動経路が見つかりませんでした');
           });
         }
       });
-      console.log(this.center);
-      this.hiddenForm();
-    },
-    hiddenForm: function hiddenForm() {
-      this.popupStyle["display"] = "none";
+      this.dispLoader();
     },
     dispForm: function dispForm() {
       this.popupStyle["display"] = "block";
       this.outputs = [];
+      this.markers = [];
+    },
+    dispLoader: function dispLoader() {
+      //Loadingを3秒表示
+      this.loaderStyle["display"] = "block";
+      Object(timers__WEBPACK_IMPORTED_MODULE_1__["setTimeout"])(this.hiddenForm, 3000);
+      Object(timers__WEBPACK_IMPORTED_MODULE_1__["setTimeout"])(this.hiddenLoader, 3000);
+    },
+    hiddenForm: function hiddenForm() {
+      this.popupStyle["display"] = "none";
+    },
+    hiddenLoader: function hiddenLoader() {
+      this.loaderStyle["display"] = "none";
+    },
+    registPlan: function registPlan() {
+      //プラン名の入力チェック
+      if (this.title === '') {
+        alert('プラン名を入力してください！');
+        return false;
+      } //プランの登録
+
+
+      axios.post('api/registPlan', {
+        plan_title: this.title,
+        hour: this.hour,
+        minute: this.minute
+      }).then(function (response) {//alert('プランの登録に成功しました！');
+      })["catch"](function (error) {
+        alert('プランの登録に失敗しました...');
+      }); //目的地の登録
+
+      axios.post('api/registPlace', this.items).then(function (response) {
+        alert('プランの登録に成功しました！');
+      })["catch"](function (error) {
+        alert('プランの登録に失敗しました...');
+      }); //入力値リセット
+
+      this.resetForm(); //入力画面に戻す
+
+      this.dispForm();
+    },
+    resetForm: function resetForm() {
+      this.items = {
+        index: 1,
+        place: '',
+        time: ''
+      };
+      this.hour = 9;
+      this.minute = 0;
+      this.title = '';
+    },
+    showPlan: function showPlan() {
+      var _this2 = this;
+
+      axios.post('api/showPlan', this.items).then(function (response) {
+        _this2.plans = response.data;
+      })["catch"](function (error) {
+        alert('プランの取得に失敗しました。');
+      });
+    },
+    getPlanDetail: function getPlanDetail(id) {
+      var _this3 = this;
+
+      //item配列をリセット
+      this.items = []; //idからplace取得
+
+      axios.post('api/getPlaces/', {
+        plan_id: id
+      }).then(function (response) {
+        var params = response.data; //item設定
+
+        params.forEach(function (param) {
+          _this3.items.push({
+            index: _this3.items.length + 1,
+            place: param.place,
+            time: param.time
+          });
+        }); // タイトルと出発時刻設定
+
+        _this3.plans.forEach(function (plan) {
+          if (plan.id === id) {
+            _this3.hour = plan.start_time_h;
+            _this3.minute = plan.start_time_m;
+            _this3.title = plan.plan_title;
+          }
+        }); //placeList表示
+
+
+        _this3.createPlaceLists();
+      })["catch"](function (error) {
+        alert('お探しのプランが見つかりませんでした。');
+      });
     }
   }
 });
@@ -4480,41 +4663,47 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      center: {
-        lat: 35.6585805,
-        lng: 139.7454329
-      },
-      zoom: 12
+      params: this.$parent.items
     };
   },
-  mounted: function mounted() {
-    this.getCenter();
+  created: function created() {
+    console.log(this.params);
   },
-  methods: {
-    getCenter: function getCenter() {}
-  } // computed:{
-  //     google: gmapApi
-  // }
+  // mounted(){
+  //     this.getParams();
+  // },
+  computed: {
+    getParams: function getParams() {
+      console.log(this.params);
+    }
+  },
+  watch: {
+    params: function params() {
+      console.log(this.params);
+    } // data(){
+    //     return{
+    //         center: {
+    //             lat:35.6585805, 
+    //             lng:139.7454329
+    //         },
+    //         zoom: 12,
+    //     }
+    // },
+    // mounted(){
+    //     this.getCenter();
+    // },
+    // methods:{
+    //     getCenter(){
+    //     }
+    // }
+    // computed:{
+    //     google: gmapApi
+    // }
 
+  }
 });
 
 /***/ }),
@@ -36832,6 +37021,66 @@ return jQuery;
 
 /***/ }),
 
+/***/ "./node_modules/os-browserify/browser.js":
+/*!***********************************************!*\
+  !*** ./node_modules/os-browserify/browser.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+exports.endianness = function () { return 'LE' };
+
+exports.hostname = function () {
+    if (typeof location !== 'undefined') {
+        return location.hostname
+    }
+    else return '';
+};
+
+exports.loadavg = function () { return [] };
+
+exports.uptime = function () { return 0 };
+
+exports.freemem = function () {
+    return Number.MAX_VALUE;
+};
+
+exports.totalmem = function () {
+    return Number.MAX_VALUE;
+};
+
+exports.cpus = function () { return [] };
+
+exports.type = function () { return 'Browser' };
+
+exports.release = function () {
+    if (typeof navigator !== 'undefined') {
+        return navigator.appVersion;
+    }
+    return '';
+};
+
+exports.networkInterfaces
+= exports.getNetworkInterfaces
+= function () { return {} };
+
+exports.arch = function () { return 'javascript' };
+
+exports.platform = function () { return 'browser' };
+
+exports.tmpdir = exports.tmpDir = function () {
+    return '/tmp';
+};
+
+exports.EOL = '\n';
+
+exports.homedir = function () {
+	return '/'
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/popper.js/dist/esm/popper.js":
 /*!***************************************************!*\
   !*** ./node_modules/popper.js/dist/esm/popper.js ***!
@@ -40756,52 +41005,61 @@ var render = function() {
     "div",
     { attrs: { id: "form-component" } },
     [
-      _c(
-        "GmapMap",
-        {
-          staticStyle: { width: "1000px", height: "400px" },
-          attrs: {
-            center: _vm.center,
-            zoom: _vm.zoom,
-            "map-type-id": "roadmap"
-          }
-        },
-        _vm._l(_vm.markers, function(m, index) {
-          return _c("GmapMarker", {
-            key: index,
-            attrs: {
-              position: m.position,
-              label: m.label,
-              clickable: true,
-              draggable: false
-            },
-            on: {
-              click: function($event) {
-                _vm.center = m.position
-              }
-            }
-          })
-        }),
-        1
-      ),
+      _c("div", { staticClass: "loading-bg", style: _vm.loaderStyle }, [
+        _c("div", [_vm._v("Searching...")])
+      ]),
       _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "container" },
-        [
-          _c("div", { style: _vm.popupStyle, attrs: { id: "popup-bg" } }, [
-            _c("div", { staticClass: "popup" }, [
-              _c("h3", [_vm._v("目的地の設定")]),
+      _c("div", { staticClass: "popup", style: _vm.popupStyle }, [
+        _c("div", { staticClass: "grid-container" }, [
+          _c(
+            "ul",
+            {
+              staticClass: "tabs",
+              attrs: { "data-tabs": "", id: "example-tabs" }
+            },
+            [
+              _vm._m(0),
               _vm._v(" "),
               _c(
+                "li",
+                {
+                  staticClass: "tabs-title",
+                  on: {
+                    click: function($event) {
+                      return _vm.showPlan()
+                    }
+                  }
+                },
+                [
+                  _c("a", { attrs: { href: "#plan-list" } }, [
+                    _vm._v("モデルプラン")
+                  ])
+                ]
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "tabs-content",
+              attrs: { "data-tabs-content": "example-tabs" }
+            },
+            [
+              _c(
                 "div",
-                { staticClass: "grid-container" },
+                {
+                  staticClass: "tabs-panel is-active",
+                  attrs: { id: "input-form" }
+                },
                 [
                   _vm._l(_vm.items, function(item) {
                     return _c(
                       "div",
                       { key: item.index, staticClass: "grid-x grid-padding-x" },
                       [
+                        _c("div", { staticClass: "cell medium-1" }),
+                        _vm._v(" "),
                         _c("input", {
                           attrs: { type: "hidden" },
                           domProps: { value: item.index }
@@ -40819,7 +41077,6 @@ var render = function() {
                                   expression: "item.place"
                                 }
                               ],
-                              staticClass: "place",
                               attrs: { type: "text" },
                               domProps: { value: item.place },
                               on: {
@@ -40834,7 +41091,7 @@ var render = function() {
                           ])
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "cell medium-4" }, [
+                        _c("div", { staticClass: "cell medium-3" }, [
                           _c("label", [
                             _vm._v("滞在時間(分)"),
                             _c("input", {
@@ -40846,7 +41103,6 @@ var render = function() {
                                   expression: "item.time"
                                 }
                               ],
-                              staticClass: "time",
                               attrs: {
                                 type: "number",
                                 min: "10",
@@ -40866,229 +41122,378 @@ var render = function() {
                           ])
                         ]),
                         _vm._v(" "),
-                        item.index > 1 && item.index === _vm.items.length
-                          ? _c(
-                              "button",
-                              {
-                                staticClass: "button secondary",
-                                attrs: { id: "deleteForm" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.deleteForm()
+                        _c("div", { staticClass: "button-wrapper" }, [
+                          item.index > 1 && item.index === _vm.items.length
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "button secondary",
+                                  attrs: { id: "delete-form" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteForm()
+                                    }
                                   }
-                                }
-                              },
-                              [_vm._v("Delete")]
-                            )
-                          : _vm._e()
+                                },
+                                [_vm._v("Delete")]
+                              )
+                            : _vm._e()
+                        ])
                       ]
                     )
                   }),
                   _vm._v(" "),
                   _c("div", { staticClass: "grid-x grid-padding-x" }, [
-                    _c("div", { staticClass: "cell medium-4" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "hollow button secondary",
-                          on: {
-                            click: function($event) {
-                              return _vm.addForm()
+                    _c("div", { staticClass: "cell medium-12" }, [
+                      _c("div", { staticClass: "button-wrapper" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "hollow button secondary add-button",
+                            on: {
+                              click: function($event) {
+                                return _vm.addForm()
+                              }
                             }
-                          }
-                        },
-                        [_vm._v("＋目的地を追加")]
-                      )
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("label", [_vm._v("出発時刻")]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "grid-x grid-padding-x" }, [
-                    _c("div", { staticClass: "cell medium-2" }, [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.hour,
-                              expression: "hour"
-                            }
-                          ],
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.hour = $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            }
-                          }
-                        },
-                        _vm._l(_vm.selectHour, function(hour) {
-                          return _c(
-                            "option",
-                            { key: hour.val, domProps: { value: hour.val } },
-                            [
-                              _vm._v(
-                                _vm._s(hour.disp) +
-                                  "\n                                "
-                              )
-                            ]
-                          )
-                        }),
-                        0
-                      )
-                    ]),
-                    _vm._v(
-                      "\n                        :\n                        "
-                    ),
-                    _c("div", { staticClass: "cell medium-2" }, [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.minute,
-                              expression: "minute"
-                            }
-                          ],
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.minute = $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            }
-                          }
-                        },
-                        _vm._l(_vm.selectMinute, function(minute) {
-                          return _c(
-                            "option",
-                            {
-                              key: minute.val,
-                              domProps: { value: minute.val }
-                            },
-                            [
-                              _vm._v(
-                                _vm._s(minute.disp) +
-                                  "\n                                "
-                              )
-                            ]
-                          )
-                        }),
-                        0
-                      )
+                          },
+                          [_vm._v("＋目的地を追加")]
+                        )
+                      ])
                     ])
                   ]),
                   _vm._v(" "),
                   _c(
-                    "button",
-                    {
-                      staticClass: "button",
-                      attrs: { id: "search" },
-                      on: {
-                        click: function($event) {
-                          return _vm.sendPlaces()
-                        }
-                      }
-                    },
-                    [_vm._v("Search")]
+                    "div",
+                    { staticClass: "grid-x grid-padding-x start-time" },
+                    [
+                      _c("div", { staticClass: "cell medium-2" }),
+                      _vm._v(" "),
+                      _c("label", [_vm._v("出発時刻")]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "cell medium-2" }, [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.hour,
+                                expression: "hour"
+                              }
+                            ],
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.hour = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              }
+                            }
+                          },
+                          _vm._l(_vm.selectHour, function(hour) {
+                            return _c(
+                              "option",
+                              { key: hour.val, domProps: { value: hour.val } },
+                              [
+                                _vm._v(
+                                  _vm._s(hour.disp) +
+                                    "\n                                "
+                                )
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      ]),
+                      _vm._v(
+                        "\n                        :\n                        "
+                      ),
+                      _c("div", { staticClass: "cell medium-2" }, [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.minute,
+                                expression: "minute"
+                              }
+                            ],
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.minute = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              }
+                            }
+                          },
+                          _vm._l(_vm.selectMinute, function(minute) {
+                            return _c(
+                              "option",
+                              {
+                                key: minute.val,
+                                domProps: { value: minute.val }
+                              },
+                              [
+                                _vm._v(
+                                  _vm._s(minute.disp) +
+                                    "\n                                "
+                                )
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "cell medium-3" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "button search-button",
+                            attrs: { id: "search" },
+                            on: {
+                              click: function($event) {
+                                return _vm.sendPlaces()
+                              }
+                            }
+                          },
+                          [_vm._v("Search")]
+                        )
+                      ])
+                    ]
                   )
                 ],
                 2
-              )
-            ])
-          ]),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "button",
-              on: {
-                click: function($event) {
-                  return _vm.dispForm()
-                }
-              }
-            },
-            [_vm._v("Edit")]
-          ),
-          _vm._v(" "),
-          _vm._l(_vm.outputs, function(output) {
-            return _c("div", { key: output.index, attrs: { id: "list" } }, [
-              output.distance
-                ? _c("div", { staticClass: "card" }, [
-                    _c("div", { staticClass: "card-section" }, [
-                      _c("div", { staticClass: "distance" }, [
-                        _vm._v(_vm._s(output.distance))
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "duration" }, [
-                        _vm._v(_vm._s(output.duration))
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "tabs-panel grid-x grid-padding-x",
+                  attrs: { id: "plan-list" }
+                },
+                _vm._l(_vm.plans, function(plan) {
+                  return _c("div", { key: plan.id }, [
+                    _c("div", { staticClass: "card cell medium-8" }, [
+                      _c("div", { staticClass: "card-section grid-x" }, [
+                        _c(
+                          "div",
+                          {
+                            staticClass: "cell medium-8 plan-title",
+                            on: {
+                              click: function($event) {
+                                return _vm.getPlanDetail(plan.id)
+                              }
+                            }
+                          },
+                          [_vm._v(_vm._s(plan.plan_title))]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "cell medium-4" }, [
+                          _vm._v(_vm._s(plan.created_at))
+                        ])
                       ])
                     ])
                   ])
-                : _vm._e(),
-              _vm._v(" "),
-              _c("div", { staticClass: "card" }, [
-                _c("div", { staticClass: "card-divider grid-x" }, [
-                  _c("div", { staticClass: "place cell medium-9" }, [
-                    _c("p", {}, [
+                }),
+                0
+              )
+            ]
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c(
+          "div",
+          { staticClass: "columns medium-8" },
+          [
+            _c(
+              "GmapMap",
+              {
+                attrs: {
+                  center: _vm.center,
+                  zoom: _vm.zoom,
+                  "map-type-id": "roadmap"
+                }
+              },
+              _vm._l(_vm.markers, function(m, index) {
+                return _c("GmapMarker", {
+                  key: index,
+                  attrs: {
+                    position: m.position,
+                    label: m.label,
+                    clickable: true,
+                    draggable: false
+                  },
+                  on: {
+                    click: function($event) {
+                      _vm.center = m.position
+                    }
+                  }
+                })
+              }),
+              1
+            )
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "columns medium-4 place-list" },
+          [
+            _c("div", { staticClass: "button-wrapper" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "button search-button",
+                  on: {
+                    click: function($event) {
+                      return _vm.dispForm()
+                    }
+                  }
+                },
+                [_vm._v("Edit")]
+              )
+            ]),
+            _vm._v(" "),
+            _c("label", [_vm._v("プラン名")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.title,
+                  expression: "title"
+                }
+              ],
+              attrs: { type: "text" },
+              domProps: { value: _vm.title },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.title = $event.target.value
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "button search-button",
+                on: {
+                  click: function($event) {
+                    return _vm.registPlan()
+                  }
+                }
+              },
+              [_vm._v("Regist")]
+            ),
+            _vm._v(" "),
+            _vm._l(_vm.outputs, function(output) {
+              return _c("div", { key: output.index, attrs: { id: "list" } }, [
+                output.distance
+                  ? _c("div", { staticClass: "card" }, [
+                      _c("div", { staticClass: "card-section" }, [
+                        _c("div", { staticClass: "distance" }, [
+                          _vm._v(
+                            _vm._s(output.duration) +
+                              " (" +
+                              _vm._s(output.distance) +
+                              ")"
+                          )
+                        ])
+                      ])
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-divider grid-x" }, [
+                    _c("div", { staticClass: "place cell medium-8" }, [
                       _vm._v(
-                        "【" +
+                        "\n                            【" +
                           _vm._s(output.index) +
                           "】 " +
-                          _vm._s(output.place)
+                          _vm._s(output.place) +
+                          "\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "place cell medium-4" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(output.fromTime) +
+                          " ~ " +
+                          _vm._s(output.toTime) +
+                          "\n                        "
                       )
                     ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "card-section" }, [
-                  _c("p", {}, [_vm._v("住所：" + _vm._s(output.address))]),
-                  _vm._v(" "),
-                  _c("p", {}, [
-                    _vm._v("滞在時間：" + _vm._s(output.time) + "分")
                   ]),
                   _vm._v(" "),
-                  _c("input", {
-                    attrs: { name: "lat", type: "hidden" },
-                    domProps: { value: output.lat }
-                  }),
-                  _vm._v(" "),
-                  _c("input", {
-                    attrs: { name: "lng", type: "hidden" },
-                    domProps: { value: output.lng }
-                  })
+                  _c("div", { staticClass: "card-section" }, [
+                    _c("p", [_vm._v("住所：" + _vm._s(output.address))]),
+                    _vm._v(" "),
+                    _c("p", [
+                      _vm._v("滞在時間：" + _vm._s(output.time) + "分")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      attrs: { name: "lat", type: "hidden" },
+                      domProps: { value: output.lat }
+                    }),
+                    _vm._v(" "),
+                    _c("input", {
+                      attrs: { name: "lng", type: "hidden" },
+                      domProps: { value: output.lng }
+                    })
+                  ])
                 ])
               ])
-            ])
-          })
-        ],
-        2
-      )
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _c("map-component")
     ],
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("li", { staticClass: "tabs-title is-active" }, [
+      _c("a", { attrs: { href: "#input-form", "aria-selected": "true" } }, [
+        _vm._v("目的地の設定")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -41110,10 +41515,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("GmapMap", {
-    staticStyle: { width: "1000px", height: "400px" },
-    attrs: { center: _vm.center, zoom: _vm.zoom, "map-type-id": "roadmap" }
-  })
+  return _c("div")
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -53282,7 +53684,6 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue2_google_maps__WEBPACK_IMPORTED_MODULE_1__, {
   load: {
-    // key: "{{ env('API_KEY') }}",
     key: "AIzaSyCqiZNO6bcyvPIrXnTk_SB6zjXqn2A1cf0",
     libraries: 'places'
   }
@@ -53318,119 +53719,107 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
 // }
 // // 初回読み込み時
 // initMap();
-
-var vm = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
-  el: '#searchForm',
-  data: {
-    num: 0,
-    lists: [],
-    place: '',
-    time: '',
-    markers: [],
-    origin: ''
-  },
-  methods: {
-    getLocation: function getLocation() {
-      var _this = this;
-
-      axios.post('api/place', {
-        place: encodeURI(this.place)
-      }).then(function (response) {
-        var results = response.data.results[0]; // 地図の中心
-
-        point = {
-          lat: results.geometry.location.lat,
-          lng: results.geometry.location.lng
-        }; //地図を表示
-
-        initMap();
-
-        _this.lists.push({
-          // num: this.num + 1,
-          address: results.formatted_address,
-          place: _this.place,
-          time: _this.time,
-          lat: results.geometry.location.lat,
-          lng: results.geometry.location.lng
-        }); // if(this.lists.length > 1){
-        //     this.getRoute(this.origin, this.place, this.lists.length - 1);
-        // }
-
-
-        console.log(_this.lists); // マーカーを追加
-
-        _this.addMarker(point, String(_this.lists.length), map);
-
-        _this.markers.forEach(function (marker) {
-          // マーカーを置く
-          marker.setMap(map);
-        }); // 出発地点設定
-
-
-        _this.origin = _this.place; // this.num = this.num + 1;
-        // 入力フォームのリセット
-
-        _this.place = '';
-        _this.time = '';
-      })["catch"](function (error) {
-        alert('目的地を見つけられませんでした！');
-        console.log(error);
-      });
-    },
-    addMarker: function addMarker(point, index, map) {
-      var marker = new google.maps.Marker({
-        position: point,
-        label: String(index),
-        map: map
-      });
-      this.markers.push(marker);
-    },
-    getRoute: function getRoute(origin, destination, num) {
-      var _this2 = this;
-
-      axios.post('api/route', {
-        origin: encodeURI(origin),
-        destination: encodeURI(destination)
-      }).then(function (response) {
-        _this2.$set(_this2.lists[num], 'distance', response.data.routes[0].legs[0].distance.text);
-
-        _this2.$set(_this2.lists[num], 'duration', response.data.routes[0].legs[0].duration.text);
-      }); // var directionsService = new google.maps.DirectionsService;
-      // var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, draggable: true});
-      // directionsDisplay.setMap(map);
-      // directionsService.route({
-      //     origin: origin,
-      //     destination: destination,
-      //     travelMode: travelMode,
-      // },
-      // function(response, status){
-      //     if(status === 'OK'){
-      //         directionsDisplay.setDirections(response);
-      //     }
-      // });
-    },
-    get_data: function get_data(name) {
-      return this.$data[name];
-    },
-    deleteData: function deleteData(message) {
-      if (!confirm('削除してもよろしいですか？')) {
-        return false;
-      } //削除対象のインデックス
-
-
-      var num = message;
-      this.lists.splice(num, 1); //表示されているマーカーを消す
-      // this.markers[num].setMap(null);
-      //マーカー消す
-
-      this.markers.splice(num, 1);
-      this.markers.forEach(function (marker) {
-        // マーカーを置く
-        marker.setMap(map);
-      });
-    }
-  }
-});
+// const vm = new Vue({
+//     el: '#searchForm',
+//     data:{
+//         num: 0,
+//         lists:[],
+//         place: '',
+//         time: '',
+//         markers:[],
+//         origin: '',
+//     },
+//     methods:{
+//         getLocation: function(){
+//             axios.post('api/place', {place: encodeURI(this.place)}).then((response) => {
+//                 var results = response.data.results[0];
+//                 // 地図の中心
+//                 point = {
+//                     lat: results.geometry.location.lat,
+//                     lng: results.geometry.location.lng
+//                 };
+//                 //地図を表示
+//                 initMap();
+//                 this.lists.push({
+//                     // num: this.num + 1,
+//                     address: results.formatted_address,
+//                     place: this.place,
+//                     time: this.time,
+//                     lat: results.geometry.location.lat,
+//                     lng: results.geometry.location.lng,
+//                 });
+//                 // if(this.lists.length > 1){
+//                 //     this.getRoute(this.origin, this.place, this.lists.length - 1);
+//                 // }
+//                 console.log(this.lists);
+//                 // マーカーを追加
+//                 this.addMarker(point, String(this.lists.length), map);
+//                 this.markers.forEach(marker => {
+//                     // マーカーを置く
+//                     marker.setMap(map);
+//                 });
+//                 // 出発地点設定
+//                 this.origin = this.place;
+//                 // this.num = this.num + 1;
+//                 // 入力フォームのリセット
+//                 this.place = '';
+//                 this.time = '';
+//             }).catch(error => {
+//                 alert('目的地を見つけられませんでした！');
+//                 console.log(error);
+//             });
+//         },
+//         addMarker: function(point, index, map){
+//             var marker = new google.maps.Marker({
+//                 position: point,
+//                 label: String(index),
+//                 map: map
+//             });
+//             this.markers.push(marker);
+//         },
+//         getRoute: function(origin, destination, num){
+//             axios.post('api/route', {
+//                 origin: encodeURI(origin),
+//                 destination: encodeURI(destination)
+//             }).then((response) => {
+//                 this.$set(this.lists[num], 'distance', response.data.routes[0].legs[0].distance.text);
+//                 this.$set(this.lists[num], 'duration', response.data.routes[0].legs[0].duration.text);
+//             });
+//             // var directionsService = new google.maps.DirectionsService;
+//             // var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true, draggable: true});
+//             // directionsDisplay.setMap(map);
+//             // directionsService.route({
+//             //     origin: origin,
+//             //     destination: destination,
+//             //     travelMode: travelMode,
+//             // },
+//             // function(response, status){
+//             //     if(status === 'OK'){
+//             //         directionsDisplay.setDirections(response);
+//             //     }
+//             // });
+//         },
+//         get_data(name) {
+//             return this.$data[name];
+//         },
+//         deleteData: function(message){
+//             if(!confirm('削除してもよろしいですか？')){
+//                 return false;
+//             }
+//             //削除対象のインデックス
+//             var num = message;
+//             this.lists.splice(num, 1);
+//             //表示されているマーカーを消す
+//             // this.markers[num].setMap(null);
+//             //マーカー消す
+//             this.markers.splice(num, 1);
+//             this.markers.forEach(marker => {
+//                 // マーカーを置く
+//                 marker.setMap(map);
+//             });
+//         }
+//     },
+// });
 
 /***/ }),
 
