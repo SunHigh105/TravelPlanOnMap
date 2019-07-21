@@ -335,6 +335,7 @@ export default {
             axios.post('api/registPlace', this.items).then((response) => {
                 alert('プランの登録に成功しました！');
             }).catch((error) => {
+                console.log(error);
                 alert('プランの登録に失敗しました...');
             });
             //入力値リセット

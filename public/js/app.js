@@ -4588,6 +4588,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.post('api/registPlace', this.items).then(function (response) {
         alert('プランの登録に成功しました！');
       })["catch"](function (error) {
+        console.log(error);
         alert('プランの登録に失敗しました...');
       }); //入力値リセット
 
