@@ -4365,7 +4365,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -4403,6 +4402,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     console.log('This is FormComponent.');
     this.createSelectList();
+    this.showPlan();
   },
   methods: {
     createSelectList: function createSelectList() {
@@ -4621,7 +4621,7 @@ __webpack_require__.r(__webpack_exports__);
       //item配列をリセット
       this.items = []; //idからplace取得
 
-      axios.post('api/getPlaces/', {
+      axios.post('api/getPlaces', {
         plan_id: id
       }).then(function (response) {
         var params = response.data; //item設定
@@ -4645,6 +4645,7 @@ __webpack_require__.r(__webpack_exports__);
 
         _this3.createPlaceLists();
       })["catch"](function (error) {
+        console.log(error);
         alert('お探しのプランが見つかりませんでした。');
       });
     }
@@ -41012,33 +41013,7 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "popup", style: _vm.popupStyle }, [
         _c("div", { staticClass: "grid-container" }, [
-          _c(
-            "ul",
-            {
-              staticClass: "tabs",
-              attrs: { "data-tabs": "", id: "example-tabs" }
-            },
-            [
-              _vm._m(0),
-              _vm._v(" "),
-              _c(
-                "li",
-                {
-                  staticClass: "tabs-title",
-                  on: {
-                    click: function($event) {
-                      return _vm.showPlan()
-                    }
-                  }
-                },
-                [
-                  _c("a", { attrs: { href: "#plan-list" } }, [
-                    _vm._v("モデルプラン")
-                  ])
-                ]
-              )
-            ]
-          ),
+          _vm._m(0),
           _vm._v(" "),
           _c(
             "div",
@@ -41291,31 +41266,39 @@ var render = function() {
                   staticClass: "tabs-panel grid-x grid-padding-x",
                   attrs: { id: "plan-list" }
                 },
-                _vm._l(_vm.plans, function(plan) {
-                  return _c("div", { key: plan.id }, [
-                    _c("div", { staticClass: "card cell medium-8" }, [
-                      _c("div", { staticClass: "card-section grid-x" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass: "cell medium-8 plan-title",
-                            on: {
-                              click: function($event) {
-                                return _vm.getPlanDetail(plan.id)
+                [
+                  _vm.plans.length === 0
+                    ? _c("div", [
+                        _vm._v("まだモデルプランが登録されていません。")
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm._l(_vm.plans, function(plan) {
+                    return _c("div", { key: plan.id }, [
+                      _c("div", { staticClass: "card cell medium-8" }, [
+                        _c("div", { staticClass: "card-section grid-x" }, [
+                          _c(
+                            "div",
+                            {
+                              staticClass: "cell medium-8 plan-title",
+                              on: {
+                                click: function($event) {
+                                  return _vm.getPlanDetail(plan.id)
+                                }
                               }
-                            }
-                          },
-                          [_vm._v(_vm._s(plan.plan_title))]
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "cell medium-4" }, [
-                          _vm._v(_vm._s(plan.created_at))
+                            },
+                            [_vm._v(_vm._s(plan.plan_title))]
+                          ),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "cell medium-4" }, [
+                            _vm._v(_vm._s(plan.created_at))
+                          ])
                         ])
                       ])
                     ])
-                  ])
-                }),
-                0
+                  })
+                ],
+                2
               )
             ]
           )
@@ -41362,21 +41345,6 @@ var render = function() {
           "div",
           { staticClass: "columns medium-4 place-list" },
           [
-            _c("div", { staticClass: "button-wrapper" }, [
-              _c(
-                "button",
-                {
-                  staticClass: "button search-button",
-                  on: {
-                    click: function($event) {
-                      return _vm.dispForm()
-                    }
-                  }
-                },
-                [_vm._v("Edit")]
-              )
-            ]),
-            _vm._v(" "),
             _c("label", [_vm._v("プラン名")]),
             _vm._v(" "),
             _c("input", {
@@ -41411,6 +41379,19 @@ var render = function() {
                 }
               },
               [_vm._v("Regist")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "button search-button",
+                on: {
+                  click: function($event) {
+                    return _vm.dispForm()
+                  }
+                }
+              },
+              [_vm._v("Edit")]
             ),
             _vm._v(" "),
             _vm._l(_vm.outputs, function(output) {
@@ -41488,11 +41469,21 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("li", { staticClass: "tabs-title is-active" }, [
-      _c("a", { attrs: { href: "#input-form", "aria-selected": "true" } }, [
-        _vm._v("目的地の設定")
-      ])
-    ])
+    return _c(
+      "ul",
+      { staticClass: "tabs", attrs: { "data-tabs": "", id: "example-tabs" } },
+      [
+        _c("li", { staticClass: "tabs-title is-active" }, [
+          _c("a", { attrs: { href: "#input-form", "aria-selected": "true" } }, [
+            _vm._v("目的地の設定")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("li", { staticClass: "tabs-title" }, [
+          _c("a", { attrs: { href: "#plan-list" } }, [_vm._v("モデルプラン")])
+        ])
+      ]
+    )
   }
 ]
 render._withStripped = true

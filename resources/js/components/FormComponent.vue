@@ -9,7 +9,7 @@
         <div class="grid-container">
             <ul class="tabs" data-tabs id="example-tabs">
                 <li class="tabs-title is-active"><a href="#input-form" aria-selected="true">目的地の設定</a></li>
-                <li class="tabs-title" v-on:click="showPlan()"><a href="#plan-list">モデルプラン</a></li>
+                <li class="tabs-title"><a href="#plan-list">モデルプラン</a></li>
             </ul>
             <!--<h3>目的地の設定</h3>-->
             <div class="tabs-content" data-tabs-content="example-tabs">
@@ -60,6 +60,7 @@
                     </div>
                 </div>
                 <div class="tabs-panel grid-x grid-padding-x" id="plan-list">
+                    <div v-if="plans.length === 0">まだモデルプランが登録されていません。</div>
                     <div v-for="plan in plans" v-bind:key="plan.id">
                         <div class="card cell medium-8">
                             <div class="card-section grid-x">
@@ -93,12 +94,10 @@
         </div>
         <!--place list-->
         <div class="columns medium-4 place-list">
-            <div class="button-wrapper">
-                <button class="button search-button" v-on:click="dispForm()">Edit</button>
-            </div>
             <label>プラン名</label>
             <input type="text" v-model="title">
             <button class="button search-button" v-on:click="registPlan()">Regist</button>
+            <button class="button search-button" v-on:click="dispForm()">Edit</button>
             <div id="list" v-for="output in outputs" v-bind:key="output.index">
                 <div class="card" v-if="output.distance">
                     <div class="card-section">
@@ -145,28 +144,34 @@ export default {
             }],
             plans: [],
             outputs:[],
+            //プランタイトル
+            title: '',
+            //出発時刻
+            hour: 9,
+            minute: 0,
+            //入力フォーム・Loading
             popupStyle: {
                 "display": "block" 
             },
             loaderStyle: {
                 "display": "none" 
             },
+            //地図関連
             center: {
                 lat:35.6585805, 
                 lng:139.7454329
             },
             zoom: 12,
             markers: [],
+            //時間のプルダウン用
             selectHour:[],
             selectMinute:[],
-            hour: 9,
-            minute: 0,
-            title: '',
         }
     },
     mounted() {
         console.log('This is FormComponent.');
         this.createSelectList();
+        this.showPlan();
     },
     methods: {
         createSelectList(){
@@ -364,7 +369,7 @@ export default {
             //item配列をリセット
             this.items = [];
             //idからplace取得
-            axios.post('api/getPlaces/', {plan_id: id})
+            axios.post('api/getPlaces', {plan_id: id})
             .then((response) => {
                 var params = response.data;
                 //item設定
@@ -386,6 +391,7 @@ export default {
                 //placeList表示
                 this.createPlaceLists();
             }).catch((error) => {
+                console.log(error);
                 alert('お探しのプランが見つかりませんでした。');
             });
         }
