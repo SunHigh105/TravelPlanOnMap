@@ -4468,6 +4468,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
         var items = [];
+        console.log(this.inputs);
         this.inputs.forEach(function (input) {
           items.push({
             index: input.index,

@@ -227,6 +227,7 @@ export default {
                 }
                 //ObjectをArrayに変換
                 var items = [];
+                console.log(this.inputs);
                 this.inputs.forEach(input => {
                     items.push({
                         index: input.index,
