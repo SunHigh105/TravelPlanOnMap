@@ -4466,6 +4466,7 @@ __webpack_require__.r(__webpack_exports__);
           throw new Error(msg);
         }
 
+        console.log(this.inputs);
         this.createPlaceLists(this.inputs);
       } catch (e) {
         alert(e);
@@ -4506,9 +4507,8 @@ __webpack_require__.r(__webpack_exports__);
             time: item.time,
             lat: results.geometry.location.lat,
             lng: results.geometry.location.lng
-          });
+          }); //マーカーを追加
 
-          console.log(_this.outputs); //マーカーを追加
 
           _this.markers.push({
             position: {

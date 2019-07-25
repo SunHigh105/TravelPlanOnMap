@@ -225,6 +225,7 @@ export default {
                 if(msg != ''){
                     throw new Error(msg);
                 }
+                console.log(this.inputs);
                 this.createPlaceLists(this.inputs);
             }catch(e){
                 alert(e);
@@ -261,7 +262,6 @@ export default {
                         lat: results.geometry.location.lat,
                         lng: results.geometry.location.lng
                     });
-                    console.log(this.outputs);
                     //マーカーを追加
                     this.markers.push({
                         position: {
