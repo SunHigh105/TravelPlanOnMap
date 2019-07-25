@@ -225,17 +225,7 @@ export default {
                 if(msg != ''){
                     throw new Error(msg);
                 }
-                //ObjectをArrayに変換
-                var items = [];
-                console.log(this.inputs);
-                this.inputs.forEach(input => {
-                    items.push({
-                        index: input.index,
-                        place: input.place,
-                        time: input.time
-                    });
-                });
-                this.createPlaceLists(items);
+                this.createPlaceLists(this.inputs);
             }catch(e){
                 alert(e);
             }
