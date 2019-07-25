@@ -271,6 +271,7 @@ export default {
                         lat: results.geometry.location.lat,
                         lng: results.geometry.location.lng,
                     });
+                    console.log(this.outputs);
                     //マーカーを追加
                     this.markers.push({
                         position: {
@@ -312,15 +313,14 @@ export default {
                         alert('移動経路が見つかりませんでした');
                     });                    
                 }
-            }); 
+            });
+            console.log(this.outputs);
             this.dispLoader();
         },
         dispForm(){
             this.popupStyle["display"] = "block";
             this.outputs = [];
             this.markers = [];
-            // clear existing directions
-            // this.$options.directionsDisplay.set('directions', null);  
         },
         dispLoader(){
             //Loadingを3秒表示

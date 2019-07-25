@@ -4516,8 +4516,9 @@ __webpack_require__.r(__webpack_exports__);
             time: item.time,
             lat: results.geometry.location.lat,
             lng: results.geometry.location.lng
-          }); //マーカーを追加
+          });
 
+          console.log(_this.outputs); //マーカーを追加
 
           _this.markers.push({
             position: {
@@ -4566,13 +4567,13 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       });
+      console.log(this.outputs);
       this.dispLoader();
     },
     dispForm: function dispForm() {
       this.popupStyle["display"] = "block";
       this.outputs = [];
-      this.markers = []; // clear existing directions
-      // this.$options.directionsDisplay.set('directions', null);  
+      this.markers = [];
     },
     dispLoader: function dispLoader() {
       //Loadingを3秒表示
