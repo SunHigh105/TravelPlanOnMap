@@ -269,7 +269,7 @@ export default {
                         place: item.place,
                         time: item.time,
                         lat: results.geometry.location.lat,
-                        lng: results.geometry.location.lng,
+                        lng: results.geometry.location.lng
                     });
                     console.log(this.outputs);
                     //マーカーを追加
@@ -368,7 +368,7 @@ export default {
                 place: '',
                 time: '',
             }];
-            this.outputs;
+            this.outputs = [];
             this.hour = 9;
             this.minute = 0;
             this.title = '';

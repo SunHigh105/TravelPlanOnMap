@@ -4621,7 +4621,7 @@ __webpack_require__.r(__webpack_exports__);
         place: '',
         time: ''
       }];
-      this.outputs;
+      this.outputs = [];
       this.hour = 9;
       this.minute = 0;
       this.title = '';
