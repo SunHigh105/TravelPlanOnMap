@@ -4365,42 +4365,50 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  // components: {
-  //     MapComponent
-  // },
   data: function data() {
     return {
-      items: [{
+      inputs: [{
         index: 1,
         place: '',
         time: ''
       }],
       plans: [],
       outputs: [],
+      //プランタイトル
+      title: '',
+      //出発時刻
+      hour: 9,
+      minute: 0,
+      //登録済みかどうか
+      isRegisterd: 0,
+      //入力フォーム・Loading
       popupStyle: {
         "display": "block"
       },
       loaderStyle: {
         "display": "none"
       },
+      //地図関連
       center: {
         lat: 35.6585805,
         lng: 139.7454329
       },
       zoom: 12,
       markers: [],
+      //時間のプルダウン用
       selectHour: [],
-      selectMinute: [],
-      hour: 9,
-      minute: 0,
-      title: ''
+      selectMinute: []
     };
   },
   mounted: function mounted() {
-    console.log('This is FormComponent.');
     this.createSelectList();
     this.showPlan();
   },
@@ -4422,9 +4430,9 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     addForm: function addForm() {
-      if (this.items.length < 10) {
-        this.items.push({
-          index: this.items.length + 1,
+      if (this.inputs.length < 10) {
+        this.inputs.push({
+          index: this.inputs.length + 1,
           place: '',
           time: ''
         });
@@ -4433,20 +4441,20 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     deleteForm: function deleteForm() {
-      if (this.items.length > 1) {
-        this.items.pop();
+      if (this.inputs.length > 1) {
+        this.inputs.pop();
       }
     },
     sendPlaces: function sendPlaces() {
       try {
         var msg = '';
-        this.items.forEach(function (item) {
-          if (item.place === '') {
-            msg = msg + '目的地' + item.index + 'を入力してください！\n';
+        this.inputs.forEach(function (input) {
+          if (input.place === '') {
+            msg = msg + '目的地' + input.index + 'を入力してください！\n';
           }
 
-          if (item.time === '') {
-            msg = msg + '滞在時間' + item.index + 'を入力してください！\n';
+          if (input.time === '') {
+            msg = msg + '滞在時間' + input.index + 'を入力してください！\n';
           }
         });
 
@@ -4456,9 +4464,18 @@ __webpack_require__.r(__webpack_exports__);
 
         if (msg != '') {
           throw new Error(msg);
-        }
+        } //ObjectをArrayに変換
 
-        this.createPlaceLists();
+
+        var items = [];
+        this.inputs.forEach(function (input) {
+          items.push({
+            index: input.index,
+            place: input.place,
+            time: input.time
+          });
+        });
+        this.createPlaceLists(items);
       } catch (e) {
         alert(e);
       }
@@ -4478,19 +4495,18 @@ __webpack_require__.r(__webpack_exports__);
 
       return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
     },
-    createPlaceLists: function createPlaceLists() {
+    createPlaceLists: function createPlaceLists(items) {
       var _this = this;
 
       var totalTime = 0;
       var fromTime = '';
       var toTime = '';
-      this.items.forEach(function (item) {
+      items.forEach(function (item) {
         //目的地取得
         axios.post('api/place', {
           place: encodeURI(item.place)
         }).then(function (response) {
-          var results = response.data.results[0];
-          console.log(response.data); //目的地を追加
+          var results = response.data.results[0]; //目的地を追加
 
           _this.outputs.push({
             index: item.index,
@@ -4527,7 +4543,7 @@ __webpack_require__.r(__webpack_exports__);
 
         if (item.index >= 2) {
           axios.post('api/route', {
-            origin: encodeURI(_this.items[item.index - 2].place),
+            origin: encodeURI(items[item.index - 2].place),
             destination: encodeURI(item.place)
           }).then(function (response) {
             // distanceとduration設定
@@ -4554,7 +4570,8 @@ __webpack_require__.r(__webpack_exports__);
     dispForm: function dispForm() {
       this.popupStyle["display"] = "block";
       this.outputs = [];
-      this.markers = [];
+      this.markers = []; // clear existing directions
+      // this.$options.directionsDisplay.set('directions', null);  
     },
     dispLoader: function dispLoader() {
       //Loadingを3秒表示
@@ -4585,7 +4602,7 @@ __webpack_require__.r(__webpack_exports__);
         alert('プランの登録に失敗しました...');
       }); //目的地の登録
 
-      axios.post('api/registPlace', this.items).then(function (response) {
+      axios.post('api/registPlace', this.inputs).then(function (response) {
         alert('プランの登録に成功しました！');
       })["catch"](function (error) {
         console.log(error);
@@ -4597,11 +4614,12 @@ __webpack_require__.r(__webpack_exports__);
       this.dispForm();
     },
     resetForm: function resetForm() {
-      this.items = {
+      this.inputs = [{
         index: 1,
         place: '',
         time: ''
-      };
+      }];
+      this.outputs;
       this.hour = 9;
       this.minute = 0;
       this.title = '';
@@ -4609,7 +4627,7 @@ __webpack_require__.r(__webpack_exports__);
     showPlan: function showPlan() {
       var _this2 = this;
 
-      axios.post('api/showPlan', this.items).then(function (response) {
+      axios.post('api/showPlan').then(function (response) {
         _this2.plans = response.data;
       })["catch"](function (error) {
         alert('プランの取得に失敗しました。');
@@ -4618,21 +4636,11 @@ __webpack_require__.r(__webpack_exports__);
     getPlanDetail: function getPlanDetail(id) {
       var _this3 = this;
 
-      //item配列をリセット
-      this.items = []; //idからplace取得
-
+      //idからplace取得
       axios.post('api/getPlaces', {
         plan_id: id
       }).then(function (response) {
-        var params = response.data; //item設定
-
-        params.forEach(function (param) {
-          _this3.items.push({
-            index: _this3.items.length + 1,
-            place: param.place,
-            time: param.time
-          });
-        }); // タイトルと出発時刻設定
+        var params = response.data; // タイトルと出発時刻設定
 
         _this3.plans.forEach(function (plan) {
           if (plan.id === id) {
@@ -4640,14 +4648,24 @@ __webpack_require__.r(__webpack_exports__);
             _this3.minute = plan.start_time_m;
             _this3.title = plan.plan_title;
           }
-        }); //placeList表示
+        }); //登録済みフラグ
 
 
-        _this3.createPlaceLists();
+        _this3.isRegisterd = 1; //placeList表示
+
+        _this3.createPlaceLists(params);
       })["catch"](function (error) {
         console.log(error);
         alert('お探しのプランが見つかりませんでした。');
       });
+    },
+    backPlanList: function backPlanList() {
+      //フォームをリセット
+      this.resetForm(); //入力フォーム表示
+
+      this.dispForm(); //登録済みフラグを戻す
+
+      this.isRegisterd = 0;
     }
   }
 });
@@ -41013,7 +41031,33 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "popup", style: _vm.popupStyle }, [
         _c("div", { staticClass: "grid-container" }, [
-          _vm._m(0),
+          _c(
+            "ul",
+            {
+              staticClass: "tabs",
+              attrs: { "data-tabs": "", id: "example-tabs" }
+            },
+            [
+              _vm._m(0),
+              _vm._v(" "),
+              _c(
+                "li",
+                {
+                  staticClass: "tabs-title",
+                  on: {
+                    click: function($event) {
+                      return _vm.showPlan()
+                    }
+                  }
+                },
+                [
+                  _c("a", { attrs: { href: "#plan-list" } }, [
+                    _vm._v("モデルプラン")
+                  ])
+                ]
+              )
+            ]
+          ),
           _vm._v(" "),
           _c(
             "div",
@@ -41029,38 +41073,41 @@ var render = function() {
                   attrs: { id: "input-form" }
                 },
                 [
-                  _vm._l(_vm.items, function(item) {
+                  _vm._l(_vm.inputs, function(input) {
                     return _c(
                       "div",
-                      { key: item.index, staticClass: "grid-x grid-padding-x" },
+                      {
+                        key: input.index,
+                        staticClass: "grid-x grid-padding-x"
+                      },
                       [
                         _c("div", { staticClass: "cell medium-1" }),
                         _vm._v(" "),
                         _c("input", {
                           attrs: { type: "hidden" },
-                          domProps: { value: item.index }
+                          domProps: { value: input.index }
                         }),
                         _vm._v(" "),
                         _c("div", { staticClass: "cell medium-6" }, [
                           _c("label", [
-                            _vm._v("目的地" + _vm._s(item.index)),
+                            _vm._v("目的地" + _vm._s(input.index)),
                             _c("input", {
                               directives: [
                                 {
                                   name: "model",
                                   rawName: "v-model",
-                                  value: item.place,
-                                  expression: "item.place"
+                                  value: input.place,
+                                  expression: "input.place"
                                 }
                               ],
                               attrs: { type: "text" },
-                              domProps: { value: item.place },
+                              domProps: { value: input.place },
                               on: {
                                 input: function($event) {
                                   if ($event.target.composing) {
                                     return
                                   }
-                                  _vm.$set(item, "place", $event.target.value)
+                                  _vm.$set(input, "place", $event.target.value)
                                 }
                               }
                             })
@@ -41075,8 +41122,8 @@ var render = function() {
                                 {
                                   name: "model",
                                   rawName: "v-model",
-                                  value: item.time,
-                                  expression: "item.time"
+                                  value: input.time,
+                                  expression: "input.time"
                                 }
                               ],
                               attrs: {
@@ -41085,13 +41132,13 @@ var render = function() {
                                 max: "2000",
                                 step: "10"
                               },
-                              domProps: { value: item.time },
+                              domProps: { value: input.time },
                               on: {
                                 input: function($event) {
                                   if ($event.target.composing) {
                                     return
                                   }
-                                  _vm.$set(item, "time", $event.target.value)
+                                  _vm.$set(input, "time", $event.target.value)
                                 }
                               }
                             })
@@ -41099,7 +41146,7 @@ var render = function() {
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "button-wrapper" }, [
-                          item.index > 1 && item.index === _vm.items.length
+                          input.index > 1 && input.index === _vm.inputs.length
                             ? _c(
                                 "button",
                                 {
@@ -41313,6 +41360,7 @@ var render = function() {
             _c(
               "GmapMap",
               {
+                ref: "myMap",
                 attrs: {
                   center: _vm.center,
                   zoom: _vm.zoom,
@@ -41368,31 +41416,48 @@ var render = function() {
               }
             }),
             _vm._v(" "),
-            _c(
-              "button",
-              {
-                staticClass: "button search-button",
-                on: {
-                  click: function($event) {
-                    return _vm.registPlan()
-                  }
-                }
-              },
-              [_vm._v("Regist")]
-            ),
-            _vm._v(" "),
-            _c(
-              "button",
-              {
-                staticClass: "button search-button",
-                on: {
-                  click: function($event) {
-                    return _vm.dispForm()
-                  }
-                }
-              },
-              [_vm._v("Edit")]
-            ),
+            _vm.isRegisterd === 0
+              ? _c("div", [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "button search-button",
+                      on: {
+                        click: function($event) {
+                          return _vm.registPlan()
+                        }
+                      }
+                    },
+                    [_vm._v("Regist")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "button search-button",
+                      on: {
+                        click: function($event) {
+                          return _vm.dispForm()
+                        }
+                      }
+                    },
+                    [_vm._v("Edit")]
+                  )
+                ])
+              : _c("div", [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "button search-button",
+                      on: {
+                        click: function($event) {
+                          return _vm.backPlanList()
+                        }
+                      }
+                    },
+                    [_vm._v("Back")]
+                  )
+                ]),
             _vm._v(" "),
             _vm._l(_vm.outputs, function(output) {
               return _c("div", { key: output.index, attrs: { id: "list" } }, [
@@ -41469,21 +41534,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "ul",
-      { staticClass: "tabs", attrs: { "data-tabs": "", id: "example-tabs" } },
-      [
-        _c("li", { staticClass: "tabs-title is-active" }, [
-          _c("a", { attrs: { href: "#input-form", "aria-selected": "true" } }, [
-            _vm._v("目的地の設定")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("li", { staticClass: "tabs-title" }, [
-          _c("a", { attrs: { href: "#plan-list" } }, [_vm._v("モデルプラン")])
-        ])
-      ]
-    )
+    return _c("li", { staticClass: "tabs-title is-active" }, [
+      _c("a", { attrs: { href: "#input-form", "aria-selected": "true" } }, [
+        _vm._v("目的地の設定")
+      ])
+    ])
   }
 ]
 render._withStripped = true

@@ -9,22 +9,22 @@
         <div class="grid-container">
             <ul class="tabs" data-tabs id="example-tabs">
                 <li class="tabs-title is-active"><a href="#input-form" aria-selected="true">目的地の設定</a></li>
-                <li class="tabs-title"><a href="#plan-list">モデルプラン</a></li>
+                <li class="tabs-title" v-on:click="showPlan();"><a href="#plan-list">モデルプラン</a></li>
             </ul>
             <!--<h3>目的地の設定</h3>-->
             <div class="tabs-content" data-tabs-content="example-tabs">
                 <div class="tabs-panel is-active" id="input-form">
-                    <div class="grid-x grid-padding-x" v-for="item in items" v-bind:key="item.index">
+                    <div class="grid-x grid-padding-x" v-for="input in inputs" v-bind:key="input.index">
                         <div class="cell medium-1"></div>
-                        <input type="hidden" :value="item.index">
+                        <input type="hidden" :value="input.index">
                         <div class="cell medium-6">
-                            <label>目的地{{ item.index }}<input type="text" v-model="item.place"></label>
+                            <label>目的地{{ input.index }}<input type="text" v-model="input.place"></label>
                         </div>
                         <div class="cell medium-3">
-                            <label>滞在時間(分)<input type="number" min=10 max=2000 step=10 v-model="item.time"></label>
+                            <label>滞在時間(分)<input type="number" min=10 max=2000 step=10 v-model="input.time"></label>
                         </div>
                         <div class="button-wrapper">
-                            <button v-if="item.index > 1 && item.index === items.length" id="delete-form" class="button secondary" v-on:click="deleteForm()">Delete</button>
+                            <button v-if="input.index > 1 && input.index === inputs.length" id="delete-form" class="button secondary" v-on:click="deleteForm()">Delete</button>
                         </div>
                     </div>
                     <div class="grid-x grid-padding-x">
@@ -76,7 +76,7 @@
     <div class="row">
         <!--map-->
         <div class="columns medium-8">
-            <GmapMap
+            <GmapMap ref="myMap"
             :center="center"
             :zoom="zoom"
             map-type-id="roadmap"
@@ -96,8 +96,13 @@
         <div class="columns medium-4 place-list">
             <label>プラン名</label>
             <input type="text" v-model="title">
-            <button class="button search-button" v-on:click="registPlan()">Regist</button>
-            <button class="button search-button" v-on:click="dispForm()">Edit</button>
+            <div v-if="isRegisterd === 0">
+                <button class="button search-button" v-on:click="registPlan()">Regist</button>
+                <button class="button search-button" v-on:click="dispForm()">Edit</button>
+            </div>
+            <div v-else>
+                <button class="button search-button" v-on:click="backPlanList()">Back</button>
+            </div>
             <div id="list" v-for="output in outputs" v-bind:key="output.index">
                 <div class="card" v-if="output.distance">
                     <div class="card-section">
@@ -132,12 +137,9 @@
 import { totalmem } from 'os';
 import { setTimeout } from 'timers';
 export default {
-    // components: {
-    //     MapComponent
-    // },
     data(){
         return{
-            items: [{
+            inputs: [{
                 index: 1,
                 place: '',
                 time: '',
@@ -149,6 +151,8 @@ export default {
             //出発時刻
             hour: 9,
             minute: 0,
+            //登録済みかどうか
+            isRegisterd: 0,
             //入力フォーム・Loading
             popupStyle: {
                 "display": "block" 
@@ -169,9 +173,8 @@ export default {
         }
     },
     mounted() {
-        console.log('This is FormComponent.');
         this.createSelectList();
-        this.showPlan();
+        this.showPlan();    
     },
     methods: {
         createSelectList(){
@@ -190,9 +193,9 @@ export default {
             }
         },
         addForm(){
-            if(this.items.length < 10){
-                this.items.push({
-                    index: this.items.length + 1,
+            if(this.inputs.length < 10){
+                this.inputs.push({
+                    index: this.inputs.length + 1,
                     place: '',
                     time: '',
                 });
@@ -201,19 +204,19 @@ export default {
             }
         },
         deleteForm(){
-            if(this.items.length > 1){
-                this.items.pop();
+            if(this.inputs.length > 1){
+                this.inputs.pop();
             }
         },
         sendPlaces(){
             try{
                 var msg = '';
-                this.items.forEach(item => {
-                    if(item.place === ''){
-                        msg = msg + '目的地' + item.index + 'を入力してください！\n';
+                this.inputs.forEach(input => {
+                    if(input.place === ''){
+                        msg = msg + '目的地' + input.index + 'を入力してください！\n';
                     }
-                    if(item.time === ''){
-                        msg = msg + '滞在時間' + item.index + 'を入力してください！\n';
+                    if(input.time === ''){
+                        msg = msg + '滞在時間' + input.index + 'を入力してください！\n';
                     }
                 });
                 if(this.hour === '' || this.minute === ''){
@@ -222,7 +225,16 @@ export default {
                 if(msg != ''){
                     throw new Error(msg);
                 }
-                this.createPlaceLists();
+                //ObjectをArrayに変換
+                var items = [];
+                this.inputs.forEach(input => {
+                    items.push({
+                        index: input.index,
+                        place: input.place,
+                        time: input.time
+                    });
+                });
+                this.createPlaceLists(items);
             }catch(e){
                 alert(e);
             }
@@ -239,17 +251,16 @@ export default {
             }
             return String(h).padStart(2, '0') + ' : ' + String(m).padStart(2, '0');
         },
-        createPlaceLists(){
+        createPlaceLists(items){
             var totalTime = 0;
             var fromTime = '';
             var toTime = '';
-            this.items.forEach(item => {
+            items.forEach(item => {
                 //目的地取得
                 axios.post('api/place', {
                     place: encodeURI(item.place)
                 }).then((response) => {
                     var results = response.data.results[0];
-                    console.log(response.data);
                     //目的地を追加
                     this.outputs.push({
                         index: item.index,
@@ -283,7 +294,7 @@ export default {
                 //移動時間・移動距離取得
                 if(item.index >= 2){
                     axios.post('api/route', {
-                        origin: encodeURI(this.items[item.index - 2].place),
+                        origin: encodeURI(items[item.index - 2].place),
                         destination: encodeURI(item.place)
                     }).then((response) => {
                         // distanceとduration設定
@@ -298,7 +309,7 @@ export default {
                         this.$set(this.outputs[item.index - 1], 'toTime', this.calcTime(this.hour, this.minute, totalTime));
                     }).catch((error) => {
                         alert('移動経路が見つかりませんでした');
-                    });
+                    });                    
                 }
             }); 
             this.dispLoader();
@@ -307,6 +318,8 @@ export default {
             this.popupStyle["display"] = "block";
             this.outputs = [];
             this.markers = [];
+            // clear existing directions
+            // this.$options.directionsDisplay.set('directions', null);  
         },
         dispLoader(){
             //Loadingを3秒表示
@@ -337,7 +350,7 @@ export default {
                 alert('プランの登録に失敗しました...');
             });
             //目的地の登録
-            axios.post('api/registPlace', this.items).then((response) => {
+            axios.post('api/registPlace', this.inputs).then((response) => {
                 alert('プランの登録に成功しました！');
             }).catch((error) => {
                 console.log(error);
@@ -349,37 +362,28 @@ export default {
             this.dispForm();
         },
         resetForm(){
-            this.items = {
+            this.inputs = [{
                 index: 1,
                 place: '',
                 time: '',
-            };
+            }];
+            this.outputs;
             this.hour = 9;
             this.minute = 0;
             this.title = '';
         },
         showPlan(){
-            axios.post('api/showPlan', this.items).then((response) => {
+            axios.post('api/showPlan').then((response) => {
                 this.plans = response.data;
             }).catch((error) => {
                 alert('プランの取得に失敗しました。');
             });
         },
         getPlanDetail(id){
-            //item配列をリセット
-            this.items = [];
             //idからplace取得
             axios.post('api/getPlaces', {plan_id: id})
             .then((response) => {
                 var params = response.data;
-                //item設定
-                params.forEach(param => {
-                    this.items.push({
-                        index: this.items.length + 1,
-                        place: param.place,
-                        time: param.time,
-                    });
-                });
                 // タイトルと出発時刻設定
                 this.plans.forEach(plan => {
                     if(plan.id === id){
@@ -388,12 +392,22 @@ export default {
                         this.title = plan.plan_title;
                     }
                 });
+                //登録済みフラグ
+                this.isRegisterd = 1;
                 //placeList表示
-                this.createPlaceLists();
+                this.createPlaceLists(params);
             }).catch((error) => {
                 console.log(error);
                 alert('お探しのプランが見つかりませんでした。');
             });
+        },
+        backPlanList(){
+            //フォームをリセット
+            this.resetForm();
+            //入力フォーム表示
+            this.dispForm();
+            //登録済みフラグを戻す
+            this.isRegisterd = 0;
         }
 
     }

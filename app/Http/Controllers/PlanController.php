@@ -35,6 +35,7 @@ class PlanController extends Controller
         logger($items);
         foreach($items as $item){
             DB::table('place')->insert([
+                'index' => $item['index'],
                 'plan_id' => $plan_id->id,
                 'place' => $item['place'],
                 'time' => $item['time']
@@ -51,7 +52,7 @@ class PlanController extends Controller
     public function getPlaces(Request $request){
         $places = DB::table('place')
                     ->where('plan_id', $request->input('plan_id'))
-                    ->orderBy('id', 'asc')->get();
+                    ->orderBy('index', 'asc')->get();
         logger($places);
         return $places;
     }

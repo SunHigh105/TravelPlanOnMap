@@ -10,6 +10,7 @@ CREATE TABLE plan(
 CREATE TABLE place(
     id SERIAL,
     plan_id INTEGER,
+    index INTEGER NOT NULL,
     place VARCHAR(255) NOT NULL,
     time INTEGER NOT NULL,
     PRIMARY KEY (id),
