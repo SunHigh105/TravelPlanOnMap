@@ -41414,6 +41414,7 @@ var render = function() {
                     "button",
                     {
                       staticClass: "button search-button",
+                      attrs: { disabled: "" },
                       on: {
                         click: function($event) {
                           return _vm.registPlan()
