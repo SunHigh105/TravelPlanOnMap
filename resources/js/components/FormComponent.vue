@@ -247,7 +247,14 @@ export default {
             var totalTime = 0;
             var fromTime = '';
             var toTime = '';
-            items.forEach(item => {
+            //オブジェクト→配列に変換
+            var array = Object.entries(items).map(item => {
+                return item[1];
+            }).sort(function(a, b){
+                return a.index - b.index;
+            });
+            console.log(array);
+            array.forEach(item => {
                 //目的地取得
                 axios.post('api/place', {
                     place: encodeURI(item.place)
@@ -358,7 +365,7 @@ export default {
                 place: '',
                 time: '',
             }];
-            this.outputs = [];
+            // this.outputs = [];
             this.hour = 9;
             this.minute = 0;
             this.title = '';
