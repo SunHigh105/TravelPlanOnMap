@@ -97,7 +97,7 @@
             <label>プラン名</label>
             <input type="text" v-model="title">
             <div v-if="isRegisterd === 0">
-                <button class="button search-button" v-on:click="registPlan()" disabled>Regist</button>
+                <button class="button search-button" v-on:click="registPlan()">Regist</button>
                 <button class="button search-button" v-on:click="dispForm()">Edit</button>
             </div>
             <div v-else>

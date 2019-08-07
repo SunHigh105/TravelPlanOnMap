@@ -32,10 +32,6 @@ Vue.component(
     'form-component', 
     require('./components/FormComponent.vue').default
 );
-Vue.component(
-    'map-component', 
-    require('./components/MapComponent.vue').default
-);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
