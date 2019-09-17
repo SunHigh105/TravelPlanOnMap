@@ -14,3 +14,5 @@
 Route::get('/', function () {
     return view('form');
 });
+Route::get('/login/{social}', 'Auth\OAuthLoginController@socialLogin')->where('social', 'twitter');
+Route::get('/login/{social}/callback', 'Auth\OAuthLoginController@handleProviderCallback')->where('social', 'twitter');

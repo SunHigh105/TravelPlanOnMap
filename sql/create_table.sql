@@ -3,8 +3,10 @@ CREATE TABLE plan(
     plan_title VARCHAR(255),
     start_time_h INTEGER NOT NULL,
     start_time_m INTEGER NOT NULL,
+    user_id INTEGER,
     created_at TIMESTAMP,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 CREATE TABLE place(

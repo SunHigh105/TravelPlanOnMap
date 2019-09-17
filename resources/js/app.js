@@ -7,6 +7,10 @@ require('./bootstrap');
 
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
+// import VueRouter from 'vue-router'
+// import FormComponent from './components/FormComponent.vue'
+// import MapComponent from './components/MapComponent.vue'
+
 
 Vue.use(VueGoogleMaps, {
   load: {
@@ -27,10 +31,21 @@ window.Vue = require('vue');
 
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-
+Vue.component(
+  'app-component', 
+  require('./components/AppComponent.vue').default
+);
 Vue.component(
     'form-component', 
     require('./components/FormComponent.vue').default
+);
+Vue.component(
+  'planlist-component', 
+  require('./components/PlanListComponent.vue').default
+);
+Vue.component(
+  'map-component', 
+  require('./components/MapComponent.vue').default
 );
 
 /**
