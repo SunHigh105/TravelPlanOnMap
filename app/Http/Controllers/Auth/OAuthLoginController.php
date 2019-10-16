@@ -11,7 +11,7 @@ class OAuthLoginController extends Controller
    //ログインボタンからリンク
    public function socialLogin($social)
    {
-       return Socialite::driver($social)->redirect();
+        return Socialite::driver($social)->redirect();
    }
    //Callback処理
    public function handleProviderCallback($social)
@@ -25,7 +25,7 @@ class OAuthLoginController extends Controller
        }
        //メールアドレスで登録状況を調べる
        $user = User::where(['email' => $userSocial->getEmail()])->first();
-      
+       logger($user);
        //メールアドレス登録の有無で条件分岐
        if($user){
            //email登録がある場合の処理
@@ -59,5 +59,11 @@ class OAuthLoginController extends Controller
            return redirect('/');
        }
        
+   }
+
+   public function logout(){
+       // 認証情報クリア
+       Auth::logout();
+       return redirect('/');
    }
 }

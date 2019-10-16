@@ -16,3 +16,5 @@ Route::get('/', function () {
 });
 Route::get('/login/{social}', 'Auth\OAuthLoginController@socialLogin')->where('social', 'twitter');
 Route::get('/login/{social}/callback', 'Auth\OAuthLoginController@handleProviderCallback')->where('social', 'twitter');
+Route::get('/logout', 'Auth\OAuthLoginController@logout');
+Route::get('/mypage', 'MyPageController@mypage');

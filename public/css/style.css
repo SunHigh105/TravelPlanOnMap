@@ -5,6 +5,12 @@
     position: fixed;
     width: 100%;
 }
+.menu .menu-text{
+    padding: 0.2rem 0.2rem;
+}
+.menu-text a{
+    color: black;
+}
 /* common */
 html, body {
     height: 100%;

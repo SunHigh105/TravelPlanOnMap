@@ -12,12 +12,20 @@
   <div class="top-bar">
       <div class="top-bar-left">
           <ul class="dropdown menu" data-dropdown-menu>
-              <li class="menu-text">Travel Plan Map</li>
+              <li class="menu-text">
+                <a href="{{ url('/')}}">Travel Plan Map</a>
+              </li>
           </ul>
       </div>
       <div class="top-bar-right">
           <ul class="menu">
+          @if(Auth::user())
+            <li>{{ Auth::user()->name }} さん</li>
+            <li><a href="{{ url('mypage')}}">Mypage</a></li>
+            <li><a href="{{ url('logout')}}">Logout</a></li>
+          @else
               <li><a href="{{ url('login/twitter')}}">twitterログイン</a></li>
+          @endif 
           </ul>
       </div>
   </div>
