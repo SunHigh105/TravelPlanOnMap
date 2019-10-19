@@ -2,14 +2,22 @@
     <div>
         <div class="tabs-panel grid-x grid-padding-x" id="plan-list">
             <div v-if="plans.length === 0">まだモデルプランが登録されていません。</div>
-            <div v-for="plan in plans" v-bind:key="plan.id">
-                <div class="card cell medium-8">
-                    <div class="card-section grid-x">
-                        <div class="cell medium-8 plan-title" v-on:click="getPlanDetail(plan.id)">{{ plan.plan_title }}</div>
-                        <div class="cell medium-4">{{ plan.created_at }}</div>
-                    </div>
-                </div>
-            </div>
+            <table class="unstriped">
+                <thead>
+                    <tr>
+                        <th>プラン名</th>
+                        <th>投稿者</th>
+                        <th>投稿日</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="plan in plans" v-bind:key="plan.id">
+                        <td class="plan-title" v-on:click="getPlanDetail(plan.id)">{{ plan.plan_title }}</td>
+                        <td>{{ plan.name }}</td>
+                        <td>{{ plan.created_at }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <map-component ref="map"></map-component>
     </div>

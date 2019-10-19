@@ -54,6 +54,9 @@
 import { totalmem } from 'os';
 import { setTimeout } from 'timers';
 export default {
+    props: {
+        login_id: String
+    },
     data(){
         return{
             inputs: [{
@@ -63,6 +66,7 @@ export default {
             }],
             hour: 9,
             minute: 0,
+            id: this.login_id,
             //時間のプルダウン用
             selectHour:[],
             selectMinute:[],
@@ -122,6 +126,7 @@ export default {
                 }
                 // 引数planInfo作成
                 let planInfo = {
+                    login_id: this.id,
                     title: '',
                     hour: this.hour,
                     minute: this.minute

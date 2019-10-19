@@ -13,7 +13,8 @@
                 <form-component 
                     ref="form"
                     @dispMap="dispMap"
-                    @hiddenMap="hiddenMap">
+                    @hiddenMap="hiddenMap"
+                    :login_id="this.id">
                 </form-component>
                 <planlist-component 
                     ref="plan"
@@ -26,8 +27,12 @@
 </template>
 <script>
 export default {
+    props: {
+        login_id: String
+    },
     data(){
         return{
+            id: this.login_id,
             loaderStyle: {
                 "display": "none" 
             },

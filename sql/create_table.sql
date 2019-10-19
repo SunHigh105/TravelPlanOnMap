@@ -18,3 +18,6 @@ CREATE TABLE place(
     PRIMARY KEY (id),
     FOREIGN KEY(plan_id) REFERENCES plan(id)
 );
+
+alter table plan add column user_id integer;
+alter table plan add FOREIGN KEY(user_id) REFERENCES users(id

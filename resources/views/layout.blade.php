@@ -18,11 +18,13 @@
           </ul>
       </div>
       <div class="top-bar-right">
-          <ul class="menu">
+          <ul class="dropdown menu" data-dropdown-menu>
           @if(Auth::user())
-            <li>{{ Auth::user()->name }} さん</li>
-            <li><a href="{{ url('mypage')}}">Mypage</a></li>
-            <li><a href="{{ url('logout')}}">Logout</a></li>
+            <a data-toggle="example-dropdown">{{ Auth::user()->name }} さん</a>
+            <div class="dropdown-pane" id="example-dropdown" data-dropdown data-auto-focus="true">
+              <li><a href="{{ url('mypage')}}">Mypage</a></li>
+              <li><a href="{{ url('logout')}}">Logout</a></li>
+            <div>
           @else
               <li><a href="{{ url('login/twitter')}}">twitterログイン</a></li>
           @endif 

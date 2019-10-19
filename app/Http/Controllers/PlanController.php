@@ -23,6 +23,7 @@ class PlanController extends Controller
             'plan_title' => $request->input('plan_title'),
             'start_time_h' => $request->input('hour'),
             'start_time_m' => $request->input('minute'),
+            'user_id' => $request->input('user_id'),
             'created_at'=> date("Y/m/d H:i:s"),
         ]);
     }
@@ -44,7 +45,11 @@ class PlanController extends Controller
     }
 
     public function showPlan(){
-        $plans = DB::table('plan')->orderBy('id','desc')->get();
+        $plans = DB::table('plan')
+                ->leftJoin('users', 'plan.user_id', '=', 'users.id')
+                ->select('plan.*', 'users.name')
+                ->orderBy('plan.id','desc')
+                ->get();
         logger($plans);
         return $plans;
     }

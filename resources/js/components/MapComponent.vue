@@ -24,8 +24,7 @@
                 <label>プラン名</label>
                 <input type="text" v-model="title">
                 <div v-if="isRegisterd === 0">
-                    <!--<button class="button search-button" v-on:click="registPlan()">Regist</button>-->
-                    <button class="button search-button" v-on:click="registPlan()">Regist</button>
+                    <button v-if="login_id != ''" class="button search-button" v-on:click="registPlan()">Regist</button>
                     <button class="button search-button" v-on:click="dispForm">Edit</button>
                 </div>
                 <div v-else>
@@ -68,6 +67,7 @@ export default {
             title: '',
             hour: '',
             minute: '',
+            login_id: '',
             //登録済みかどうか
             isRegisterd: 0,
             //地図関連
@@ -101,6 +101,7 @@ export default {
             this.hour = planInfo.hour;
             this.minute = planInfo.minute;
             this.isRegisterd = isRegisterd;
+            this.login_id = planInfo.login_id;
             // 時刻計算用
             var totalTime = 0;
             var fromTime = '';
@@ -111,7 +112,6 @@ export default {
             }).sort(function(a, b){
                 return a.index - b.index;
             });
-            //console.log(array);
             array.forEach(item => {
                 //目的地取得
                 axios.post('api/place', {
@@ -169,7 +169,6 @@ export default {
                     });                    
                 }
             });
-            console.log(this.outputs);
             this.mapStyle["display"] = "block";
         },
         dispForm(){
@@ -187,7 +186,8 @@ export default {
             axios.post('api/registPlan', {
                 plan_title: this.title,
                 hour: this.hour,
-                minute: this.minute
+                minute: this.minute,
+                user_id: this.login_id,
             }).then((response) => {
                 //alert('プランの登録に成功しました！');
             }).catch((error) => {

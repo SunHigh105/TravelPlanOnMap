@@ -4257,9 +4257,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    login_id: String
+  },
   data: function data() {
     return {
+      id: this.login_id,
       loaderStyle: {
         "display": "none"
       }
@@ -4366,6 +4371,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    login_id: String
+  },
   data: function data() {
     return {
       inputs: [{
@@ -4375,6 +4383,7 @@ __webpack_require__.r(__webpack_exports__);
       }],
       hour: 9,
       minute: 0,
+      id: this.login_id,
       //時間のプルダウン用
       selectHour: [],
       selectMinute: []
@@ -4439,6 +4448,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
         var planInfo = {
+          login_id: this.id,
           title: '',
           hour: this.hour,
           minute: this.minute
@@ -4534,7 +4544,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -4544,6 +4553,7 @@ __webpack_require__.r(__webpack_exports__);
       title: '',
       hour: '',
       minute: '',
+      login_id: '',
       //登録済みかどうか
       isRegisterd: 0,
       //地図関連
@@ -4581,7 +4591,8 @@ __webpack_require__.r(__webpack_exports__);
       this.title = planInfo.title;
       this.hour = planInfo.hour;
       this.minute = planInfo.minute;
-      this.isRegisterd = isRegisterd; // 時刻計算用
+      this.isRegisterd = isRegisterd;
+      this.login_id = planInfo.login_id; // 時刻計算用
 
       var totalTime = 0;
       var fromTime = '';
@@ -4591,8 +4602,7 @@ __webpack_require__.r(__webpack_exports__);
         return item[1];
       }).sort(function (a, b) {
         return a.index - b.index;
-      }); //console.log(array);
-
+      });
       array.forEach(function (item) {
         //目的地取得
         axios.post('api/place', {
@@ -4657,7 +4667,6 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       });
-      console.log(this.outputs);
       this.mapStyle["display"] = "block";
     },
     dispForm: function dispForm() {
@@ -4676,7 +4685,8 @@ __webpack_require__.r(__webpack_exports__);
       axios.post('api/registPlan', {
         plan_title: this.title,
         hour: this.hour,
-        minute: this.minute
+        minute: this.minute,
+        user_id: this.login_id
       }).then(function (response) {//alert('プランの登録に成功しました！');
       })["catch"](function (error) {
         alert('プランの登録に失敗しました...');
@@ -4724,6 +4734,14 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _bus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../bus */ "./resources/js/bus.js");
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -41130,6 +41148,7 @@ var render = function() {
         [
           _c("form-component", {
             ref: "form",
+            attrs: { login_id: this.id },
             on: { dispMap: _vm.dispMap, hiddenMap: _vm.hiddenMap }
           }),
           _vm._v(" "),
@@ -41490,18 +41509,20 @@ var render = function() {
           _vm._v(" "),
           _vm.isRegisterd === 0
             ? _c("div", [
-                _c(
-                  "button",
-                  {
-                    staticClass: "button search-button",
-                    on: {
-                      click: function($event) {
-                        return _vm.registPlan()
-                      }
-                    }
-                  },
-                  [_vm._v("Regist")]
-                ),
+                _vm.login_id != ""
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "button search-button",
+                        on: {
+                          click: function($event) {
+                            return _vm.registPlan()
+                          }
+                        }
+                      },
+                      [_vm._v("Regist")]
+                    )
+                  : _vm._e(),
                 _vm._v(" "),
                 _c(
                   "button",
@@ -41627,14 +41648,17 @@ var render = function() {
             ? _c("div", [_vm._v("まだモデルプランが登録されていません。")])
             : _vm._e(),
           _vm._v(" "),
-          _vm._l(_vm.plans, function(plan) {
-            return _c("div", { key: plan.id }, [
-              _c("div", { staticClass: "card cell medium-8" }, [
-                _c("div", { staticClass: "card-section grid-x" }, [
+          _c("table", { staticClass: "unstriped" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.plans, function(plan) {
+                return _c("tr", { key: plan.id }, [
                   _c(
-                    "div",
+                    "td",
                     {
-                      staticClass: "cell medium-8 plan-title",
+                      staticClass: "plan-title",
                       on: {
                         click: function($event) {
                           return _vm.getPlanDetail(plan.id)
@@ -41644,15 +41668,15 @@ var render = function() {
                     [_vm._v(_vm._s(plan.plan_title))]
                   ),
                   _vm._v(" "),
-                  _c("div", { staticClass: "cell medium-4" }, [
-                    _vm._v(_vm._s(plan.created_at))
-                  ])
+                  _c("td", [_vm._v(_vm._s(plan.name))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(plan.created_at))])
                 ])
-              ])
-            ])
-          })
-        ],
-        2
+              }),
+              0
+            )
+          ])
+        ]
       ),
       _vm._v(" "),
       _c("map-component", { ref: "map" })
@@ -41660,7 +41684,22 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("プラン名")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("投稿者")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("投稿日")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 

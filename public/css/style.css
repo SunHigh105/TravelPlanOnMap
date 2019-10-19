@@ -11,6 +11,10 @@
 .menu-text a{
     color: black;
 }
+
+.dropdown-pane{
+    width: 150px;
+}
 /* common */
 html, body {
     height: 100%;
