@@ -16,9 +16,12 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 Route::post('/place', 'RouteController@place');
 Route::post('/route', 'RouteController@route');
 Route::post('/registPlan', 'PlanController@registPlan');
 Route::post('/registPlace', 'PlanController@registPlace');
 Route::post('/showPlan', 'PlanController@showPlan');
 Route::post('/getPlaces', 'PlanController@getPlaces');
+
+Route::post('/showRegisterdPlans', 'MyPageController@showRegisterdPlans');
