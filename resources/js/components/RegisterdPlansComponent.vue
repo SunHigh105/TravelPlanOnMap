@@ -19,8 +19,8 @@
                     <tr v-for="plan in plans" v-bind:key="plan.id">
                         <td class="plan-title">{{ plan.plan_title }}</td>
                         <td>{{ plan.created_at }}</td>
-                        <td><button type="button" class="button">編集</button></td>
-                        <td><button type="button" class="alert button">削除</button></td>
+                        <td><button type="button" class="button" v-on:click="editPlan(plan.id)">編集</button></td>
+                        <td><button type="button" class="alert button" v-on:click="deletePlan(plan.id)">削除</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -52,11 +52,30 @@ export default{
             });
 
         },
-        editPlan(){
+        editPlan(id){
+            // formのページに飛ばす
+            axios.post('api/editPlan', {'id' : id})
+            .then((response) => {
+                
+            }).catch((error) => {
+                console.log(error);
+                alert('プランの取得に失敗しました。');
+            });
+
 
         },
-        deletePlan(){
-
+        deletePlan(id){
+            if(confirm('本当に削除しますか？')){
+                axios.post('api/deletePlan', {'id' : id})
+                .then((response) => {
+                    // プランを再取得
+                    this.showRegisterdPlans(this.id);
+                    alert('プランを削除しました！');
+                }).catch((error) => {
+                    console.log(error);
+                    alert('プランの削除に失敗しました。');
+                });
+            }
         }
     }
 }

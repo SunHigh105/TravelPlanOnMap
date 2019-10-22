@@ -4873,6 +4873,32 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
         alert('プランの取得に失敗しました。');
       });
+    },
+    editPlan: function editPlan(id) {
+      // formのページに飛ばす
+      axios.post('api/editPlan', {
+        'id': id
+      }).then(function (response) {})["catch"](function (error) {
+        console.log(error);
+        alert('プランの取得に失敗しました。');
+      });
+    },
+    deletePlan: function deletePlan(id) {
+      var _this2 = this;
+
+      if (confirm('本当に削除しますか？')) {
+        axios.post('api/deletePlan', {
+          'id': id
+        }).then(function (response) {
+          // プランを再取得
+          _this2.showRegisterdPlans(_this2.id);
+
+          alert('プランを削除しました！');
+        })["catch"](function (error) {
+          console.log(error);
+          alert('プランの削除に失敗しました。');
+        });
+      }
     }
   }
 });
@@ -41850,9 +41876,37 @@ var render = function() {
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(plan.created_at))]),
                   _vm._v(" "),
-                  _vm._m(1, true),
+                  _c("td", [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "button",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.editPlan(plan.id)
+                          }
+                        }
+                      },
+                      [_vm._v("編集")]
+                    )
+                  ]),
                   _vm._v(" "),
-                  _vm._m(2, true)
+                  _c("td", [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "alert button",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.deletePlan(plan.id)
+                          }
+                        }
+                      },
+                      [_vm._v("削除")]
+                    )
+                  ])
                 ])
               }),
               0
@@ -41875,26 +41929,6 @@ var staticRenderFns = [
         _c("th"),
         _vm._v(" "),
         _c("th")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("button", { staticClass: "button", attrs: { type: "button" } }, [
-        _vm._v("編集")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("button", { staticClass: "alert button", attrs: { type: "button" } }, [
-        _vm._v("削除")
       ])
     ])
   }

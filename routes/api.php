@@ -25,3 +25,5 @@ Route::post('/showPlan', 'PlanController@showPlan');
 Route::post('/getPlaces', 'PlanController@getPlaces');
 
 Route::post('/showRegisterdPlans', 'MyPageController@showRegisterdPlans');
+Route::post('/editPlan', 'MyPageController@editPlan');
+Route::post('/deletePlan', 'MyPageController@deletePlan');

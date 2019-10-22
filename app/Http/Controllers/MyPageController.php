@@ -25,4 +25,24 @@ class MyPageController extends Controller{
         logger($plans);
         return $plans;
     }
+
+    public function editPlan(Request $request){
+        logger('edit plan');
+    }
+
+    public function deletePlan(Request $request){
+        // 目的地を削除
+        logger($request->input('id'));
+        DB::table('place')
+            ->where('plan_id', $request->input('id'))
+            ->delete();
+        // プランを削除
+        DB::table('plan')
+            ->where('id', $request->input('id'))
+            ->delete();
+    }
+
+    public function withdraw(){
+
+    }
 }
