@@ -1,6 +1,17 @@
 # Travel Plan Map
 
-## How to use
+## Development Environment
+
+### Requrements
+* [composer](https://getcomposer.org/download/)
+
+### Serve app
+```
+php artisan serve
+```
+Then, visit http://127.0.0.1:8000/
+
+## How to use this app
 
 **Input and Regist Travel Plan**
 - Input destination and stay time
