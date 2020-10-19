@@ -2,7 +2,7 @@
 
 @section('content')
 <div id="app" v-cloak>
-    <form-component></form-component>
+    <main-component></main-component>
 </div>
 
 @endsection

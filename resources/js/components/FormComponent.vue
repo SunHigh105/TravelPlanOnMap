@@ -129,7 +129,6 @@
       </div>
     </div>
   </div>
-  <map-component></map-component>
 </div>
 </template>
 
