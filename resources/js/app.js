@@ -7,6 +7,7 @@ require('./bootstrap');
 
 import Vue from 'vue';
 import router from './router.js';
+import store from './store.js';
 import MainComponent from './components/MainComponent.vue'
 window.Vue = require('vue');
 
@@ -34,5 +35,6 @@ Vue.component(
 const app = new Vue({
   el: '#app',
   router,
+  store,
   render: h =>h(MainComponent)
 });
