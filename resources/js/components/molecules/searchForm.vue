@@ -13,8 +13,8 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import { mapMutations } from 'vuex'
+import { mapState } from 'vuex';
+import { mapMutations } from 'vuex';
 
 import SearchInput from '../atoms/searchInput.vue';
 import SubmitBtn from '../atoms/submitBtn.vue';
