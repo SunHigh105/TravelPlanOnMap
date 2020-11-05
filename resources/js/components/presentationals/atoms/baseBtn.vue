@@ -1,5 +1,5 @@
 <template>
-  <button type="button" @click="handleClick">{{ label }}</button>
+  <button class="c-btn" type="button" @click="handleClick">{{ label }}</button>
 </template>
 <script>
 export default {

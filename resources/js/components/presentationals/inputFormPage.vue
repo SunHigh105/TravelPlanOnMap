@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="c-input-form">
     <div>InputFormPage</div>
     <router-link to="destinations">DestinationMapping</router-link>
     <router-link to="model_plans">ModelPlanList</router-link>

@@ -50257,7 +50257,15 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("router-view")
+  return _c("div", [
+    _c("header", { staticClass: "l-header" }, [
+      _vm._v("\n    Travel Plan Map\n  ")
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "l-container" }, [_c("router-view")], 1),
+    _vm._v(" "),
+    _c("footer", { staticClass: "l-footer" }, [_vm._v("\n    footer\n  ")])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -50337,7 +50345,11 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "button",
-    { attrs: { type: "button" }, on: { click: _vm.handleClick } },
+    {
+      staticClass: "c-btn",
+      attrs: { type: "button" },
+      on: { click: _vm.handleClick }
+    },
     [_vm._v(_vm._s(_vm.label))]
   )
 }
@@ -50445,6 +50457,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
+    { staticClass: "c-input-form" },
     [
       _c("div", [_vm._v("InputFormPage")]),
       _vm._v(" "),
