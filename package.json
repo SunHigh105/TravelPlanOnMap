@@ -37,8 +37,14 @@
     },
     "dependencies": {
         "babel-polyfill": "^6.26.0",
+        "core-js": "^3.6.5",
         "dotenv": "^8.0.0",
         "vue-router": "^3.4.7",
         "vuex": "^3.5.1"
+    },
+    "jest": {
+        "moduleNameMapper": {
+            "/^@/(.*)$/": "<rootDir>/resources/js/$1"
+        }
     }
 }

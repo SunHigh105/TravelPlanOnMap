@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import InputForm from './components/pages/inputFormPage.vue';
-import DestinationMapping from './components/pages/destinationMappingPage.vue';
-import ModelPlanList from './components/pages/ModelPlanListPage.vue';
+import InputForm from '@/components/containers/searchForm.vue';
+import DestinationMapping from '@/components/presentationals/destinationMappingPage.vue';
+import ModelPlanList from '@/components/presentationals/ModelPlanListPage.vue';
 
 Vue.use(VueRouter)
 
