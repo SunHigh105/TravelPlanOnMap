@@ -1,8 +1,5 @@
 <template>
   <div class="c-input-form">
-    <div>InputFormPage</div>
-    <router-link to="destinations">DestinationMapping</router-link>
-    <router-link to="model_plans">ModelPlanList</router-link>
     <div v-for="n in count" :key="n.index">
       <BaseTxtInput :label="'Destination'" />
       <BaseNumInput 
@@ -29,10 +26,10 @@
   </div>
 </template>
 <script>
-import BaseBtn from '@/components/presentationals/atoms/baseBtn.vue';
-import BaseTxtInput from '@/components/presentationals/atoms/baseTxtInput.vue';
-import BaseNumInput from '@/components/presentationals/atoms/baseNumInput.vue';
-import TimePulldown from '@/components/presentationals/timePulldown.vue';
+import BaseBtn from '@/components/presentationals/bases/BaseBtn.vue';
+import BaseTxtInput from '@/components/presentationals/bases/BaseTxtInput.vue';
+import BaseNumInput from '@/components/presentationals/bases/BaseNumInput.vue';
+import TimePulldown from '@/components/presentationals/TimePulldown.vue';
 
 export default {
   components: {

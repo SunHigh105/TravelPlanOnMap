@@ -6,9 +6,9 @@
 require('./bootstrap');
 
 import Vue from 'vue';
-import router from './router.js';
-import store from './store.js';
-import MainComponent from './components/MainComponent.vue'
+import router from '@/router.js';
+import store from '@/store.js';
+import MainComponent from '@/components/containers/MainContainer.vue'
 window.Vue = require('vue');
 
 /**
@@ -24,7 +24,7 @@ window.Vue = require('vue');
 
 Vue.component(
   'main-component',
-  require('./components/MainComponent.vue').default
+  require('@/components/containers/MainContainer.vue').default
 );
 
 /**

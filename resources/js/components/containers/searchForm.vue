@@ -9,7 +9,7 @@
 import { mapState } from 'vuex';
 import { mapMutations } from 'vuex';
 
-import InputFormPage from '@/components/presentationals/inputFormPage.vue'
+import InputFormPage from '@/components/presentationals/InputFormPage.vue'
 
 export default {
   components: {
