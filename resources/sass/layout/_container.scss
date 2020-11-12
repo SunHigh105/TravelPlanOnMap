@@ -1,4 +1,9 @@
 .l-container {
-  width: 80%;
+  width: 70%;
   margin: 0 auto;
+  padding: 1em 0;
+
+  &__title {
+    text-align: center;
+  }
 }

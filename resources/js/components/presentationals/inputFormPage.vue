@@ -1,6 +1,6 @@
 <template>
   <div class="c-input-form">
-    <div v-for="n in count" :key="n.index">
+    <div v-for="n in count" :key="n.index" class="c-input-form__content">
       <BaseTxtInput :label="'Destination'" />
       <BaseNumInput 
         :label="'Spent Time(min)'"
@@ -16,13 +16,19 @@
         />
       </span>
     </div>
-    <BaseBtn
-      :label="'+ Add Destination'"
-      @add-destination="addDestination"
-      :click-event="'add-destination'"
-    />
-    <TimePulldown />
-    <BaseBtn :label="'Search'"/>
+    <div class="c-input-form__content">
+      <BaseBtn
+        :label="'+ Add Destination'"
+        @add-destination="addDestination"
+        :click-event="'add-destination'"
+      />
+    </div>
+    <div class="c-input-form__content">
+      <TimePulldown />
+    </div>
+    <div class="c-input-form__content">
+      <BaseBtn :label="'Search'"/>
+    </div>
   </div>
 </template>
 <script>

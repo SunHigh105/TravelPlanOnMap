@@ -11119,6 +11119,11 @@ button {
           appearance: none;
 }
 
+ul {
+  margin: 0;
+  padding: 0;
+}
+
 /* layout */
 
 .l-header {
@@ -11126,9 +11131,31 @@ button {
   background-color: beige;
 }
 
-.l-container {
-  width: 80%;
+.l-navigation {
+  width: 70%;
   margin: 0 auto;
+}
+
+.l-navigation > ul {
+  list-style: none;
+  border-bottom: 1px solid #ddd;
+}
+
+.l-navigation > ul > li {
+  display: inline-block;
+  padding: 0.5em;
+  width: 50%;
+  text-align: center;
+}
+
+.l-container {
+  width: 70%;
+  margin: 0 auto;
+  padding: 1em 0;
+}
+
+.l-container__title {
+  text-align: center;
 }
 
 .l-footer {
@@ -11145,5 +11172,13 @@ button {
   border: solid 1px #ddd;
   border-radius: 3px;
   padding: 0.3em;
+}
+
+.c-input-form {
+  padding: 1em 1.5em;
+}
+
+.c-input-form__content {
+  padding: 0.5em 0;
 }
 

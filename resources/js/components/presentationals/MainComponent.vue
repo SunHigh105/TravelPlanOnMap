@@ -4,12 +4,14 @@
       Travel Plan Map
     </header>
     <nav class="l-navigation">
-      <router-link
-        v-for="link in navLinks"
-        :key="link.path"
-        :to="link.path"
-      >{{ link.txt }}
-      </router-link>
+      <ul>
+        <li v-for="link in navLinks" :key="link.path">
+          <router-link
+            :to="link.path"
+          >{{ link.txt }}
+          </router-link>
+        </li>
+      </ul>
     </nav>
     <div class="l-container">
       <h1 class="l-container__title">{{ pageTitle }}</h1>

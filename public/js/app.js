@@ -1876,7 +1876,13 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_presentationals_MainComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/presentationals/MainComponent.vue */ "./resources/js/components/presentationals/MainComponent.vue");
+/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-js/modules/es.array.filter.js");
+/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var core_js_modules_es_array_map__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+/* harmony import */ var core_js_modules_es_array_map__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_map__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_presentationals_MainComponent_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/presentationals/MainComponent.vue */ "./resources/js/components/presentationals/MainComponent.vue");
+
+
 //
 //
 //
@@ -1886,23 +1892,29 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    MainComponent: _components_presentationals_MainComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    MainComponent: _components_presentationals_MainComponent_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
     return {
       pageTitle: 'Destination Setting',
       navLinks: [{
-        path: 'destinations',
-        txt: 'Destination Mapping'
+        path: '/',
+        txt: 'Destination Setting'
       }, {
-        path: 'model_plans',
+        path: '/model_plans',
         txt: 'Model Plans'
       }]
     };
   },
   watch: {
-    $routes: function $routes(to, from) {
-      console.log(to.params);
+    $route: function $route() {
+      var _this = this;
+
+      this.navLinks.filter(function (link) {
+        return link.path === _this.$route.path;
+      }).map(function (link) {
+        _this.pageTitle = link.txt;
+      });
     }
   }
 });
@@ -1992,6 +2004,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2030,6 +2048,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
 //
 //
 //
@@ -19369,6 +19389,36 @@ module.exports = function (name) {
 // a string of all valid unicode whitespaces
 // eslint-disable-next-line max-len
 module.exports = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.array.filter.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/core-js/modules/es.array.filter.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var $filter = __webpack_require__(/*! ../internals/array-iteration */ "./node_modules/core-js/internals/array-iteration.js").filter;
+var arrayMethodHasSpeciesSupport = __webpack_require__(/*! ../internals/array-method-has-species-support */ "./node_modules/core-js/internals/array-method-has-species-support.js");
+var arrayMethodUsesToLength = __webpack_require__(/*! ../internals/array-method-uses-to-length */ "./node_modules/core-js/internals/array-method-uses-to-length.js");
+
+var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('filter');
+// Edge 14- issue
+var USES_TO_LENGTH = arrayMethodUsesToLength('filter');
+
+// `Array.prototype.filter` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.filter
+// with adding support of @@species
+$({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGTH }, {
+  filter: function filter(callbackfn /* , thisArg */) {
+    return $filter(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
 
 
 /***/ }),
@@ -50405,7 +50455,7 @@ var render = function() {
       _vm._l(_vm.count, function(n) {
         return _c(
           "div",
-          { key: n.index },
+          { key: n.index, staticClass: "c-input-form__content" },
           [
             _c("BaseTxtInput", { attrs: { label: "Destination" } }),
             _vm._v(" "),
@@ -50433,14 +50483,34 @@ var render = function() {
         )
       }),
       _vm._v(" "),
-      _c("BaseBtn", {
-        attrs: { label: "+ Add Destination", "click-event": "add-destination" },
-        on: { "add-destination": _vm.addDestination }
-      }),
+      _c(
+        "div",
+        { staticClass: "c-input-form__content" },
+        [
+          _c("BaseBtn", {
+            attrs: {
+              label: "+ Add Destination",
+              "click-event": "add-destination"
+            },
+            on: { "add-destination": _vm.addDestination }
+          })
+        ],
+        1
+      ),
       _vm._v(" "),
-      _c("TimePulldown"),
+      _c(
+        "div",
+        { staticClass: "c-input-form__content" },
+        [_c("TimePulldown")],
+        1
+      ),
       _vm._v(" "),
-      _c("BaseBtn", { attrs: { label: "Search" } })
+      _c(
+        "div",
+        { staticClass: "c-input-form__content" },
+        [_c("BaseBtn", { attrs: { label: "Search" } })],
+        1
+      )
     ],
     2
   )
@@ -50472,16 +50542,24 @@ var render = function() {
       _vm._v("\n    Travel Plan Map\n  ")
     ]),
     _vm._v(" "),
-    _c(
-      "nav",
-      { staticClass: "l-navigation" },
-      _vm._l(_vm.navLinks, function(link) {
-        return _c("router-link", { key: link.path, attrs: { to: link.path } }, [
-          _vm._v(_vm._s(link.txt) + "\n    ")
-        ])
-      }),
-      1
-    ),
+    _c("nav", { staticClass: "l-navigation" }, [
+      _c(
+        "ul",
+        _vm._l(_vm.navLinks, function(link) {
+          return _c(
+            "li",
+            { key: link.path },
+            [
+              _c("router-link", { attrs: { to: link.path } }, [
+                _vm._v(_vm._s(link.txt) + "\n        ")
+              ])
+            ],
+            1
+          )
+        }),
+        0
+      )
+    ]),
     _vm._v(" "),
     _c(
       "div",

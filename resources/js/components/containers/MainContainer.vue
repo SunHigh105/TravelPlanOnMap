@@ -15,14 +15,18 @@ export default {
     return {
       pageTitle: 'Destination Setting',
       navLinks: [
-        { path: 'destinations', txt: 'Destination Mapping' },
-        { path: 'model_plans', txt: 'Model Plans' },
+        { path: '/', txt: 'Destination Setting' },
+        { path: '/model_plans', txt: 'Model Plans' },
       ],
     }
   },
   watch: {
-    $routes(to, from) {
-      
+    $route() {
+      this.navLinks
+        .filter(link => link.path === this.$route.path)
+        .map(link => {
+          this.pageTitle = link.txt;
+        });
     },
   }
 }
