@@ -11132,7 +11132,7 @@ ul {
 }
 
 .l-navigation {
-  width: 70%;
+  width: 80%;
   margin: 0 auto;
 }
 
@@ -11144,18 +11144,19 @@ ul {
 .l-navigation > ul > li {
   display: inline-block;
   padding: 0.5em;
-  width: 50%;
+  width: 33%;
   text-align: center;
 }
 
 .l-container {
-  width: 70%;
+  width: 80%;
   margin: 0 auto;
   padding: 1em 0;
 }
 
 .l-container__title {
   text-align: center;
+  font-size: 2em;
 }
 
 .l-footer {
@@ -11180,5 +11181,27 @@ ul {
 
 .c-input-form__content {
   padding: 0.5em 0;
+}
+
+.c-mapping__mapview .vue-map-container {
+  width: auto;
+  height: 60vh;
+}
+
+.c-mapping__list {
+  border: solid 1px #ddd;
+  margin: 1em 0;
+  padding: 1em;
+  height: 25vh;
+  overflow-y: scroll;
+}
+
+.c-mapping__list > ul {
+  list-style: none;
+}
+
+.c-mapping__list > ul > li {
+  border-bottom: 1px solid #ddd;
+  padding: 0.5em;
 }
 

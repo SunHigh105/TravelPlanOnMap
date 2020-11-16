@@ -16,6 +16,7 @@ export default {
       pageTitle: 'Destination Setting',
       navLinks: [
         { path: '/', txt: 'Destination Setting' },
+        { path: '/destinations', txt: 'Map' },
         { path: '/model_plans', txt: 'Model Plans' },
       ],
     }
