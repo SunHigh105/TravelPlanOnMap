@@ -16,7 +16,7 @@ export default {
     [...Array(5)].map((_, i) => {
       this.destinationList.push({
         index: i + 1,
-        place: `Destination_${i}`,
+        place: `Destination_${i + 1}`,
         time: `${(i + 1) * 10}(min)`,
         distance: `${(i + 1) * 10}(km)`,
       });
