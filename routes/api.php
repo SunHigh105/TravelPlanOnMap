@@ -24,7 +24,6 @@ Route::middleware(['cors'])->group(function () {
     Route::post('/route', 'RouteController@route');
 });
 
-Route::post('/place', 'RouteController@place');
 Route::post('/registPlan', 'PlanController@registPlan');
 Route::post('/registPlace', 'PlanController@registPlace');
 Route::post('/showPlan', 'PlanController@showPlan');

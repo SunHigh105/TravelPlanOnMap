@@ -13,16 +13,6 @@ use Illuminate\Http\Request;
 
 class RouteController extends Controller
 {
-    public function place(Request $request){
-        $client = new \GuzzleHttp\Client();
-        $base = 'https://maps.googleapis.com/maps/api/geocode/json?language=ja&';
-        $place = $request->input('place');
-        $apikey = config('app.apikey');
-        $url = $base.'address='.$place.'&key='.$apikey;
-        $response = $client->request('GET', $url);
-        echo $response->getBody();
-    }
-
     public function route(Request $request){
         $base = 'https://maps.googleapis.com/maps/api/directions/json?language=ja&';
         $url = $base.'origin='.$request->input('origin').'&destination='.$request->input('destination').'&key='.config('app.apikey');
