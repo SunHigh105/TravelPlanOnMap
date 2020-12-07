@@ -27,16 +27,15 @@ class RouteController extends Controller
         $base = 'https://maps.googleapis.com/maps/api/directions/json?language=ja&';
         $url = $base.'origin='.$request->input('origin').'&destination='.$request->input('destination').'&key='.config('app.apikey');
 
-        $curl = curl_init();
-        curl_setopt($curl,CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            "Content-Type: application/json",
-            "Accept: application/json",
-            'Access-Control-Allow-Origin', '*'
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('GET', $url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Access-Control-Allow-Origin' => '*'
+            ]
         ]);
-        $response = curl_exec($curl);
 
-        return $response;
+        return $response->getBody();
     }
 }
