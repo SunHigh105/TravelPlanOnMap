@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>TravelMap</title>
+    <title>TravelPlanMap</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.5.3/css/foundation.css">-->
     <link rel="stylesheet" href="/css/style.css">

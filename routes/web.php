@@ -14,3 +14,9 @@
 Route::get('/', function () {
     return view('form');
 });
+
+Route::redirect('/map', '/');
+
+Route::get('/model_plans', function () {
+    return view('form');
+});
