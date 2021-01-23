@@ -2,5 +2,5 @@
 
 @section('content')
 <div id="app" v-cloak>
-    <main-component></main-component>
+    <main-page></main-page>
 </div>
