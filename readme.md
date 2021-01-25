@@ -6,6 +6,19 @@
 * [composer](https://getcomposer.org/download/)
 * postgresql
 
+### Environment Variables Setting
+* Create `.env`
+* [Get Google Map API key](https://developers.google.com/maps/api-key-best-practices)
+* Write variables in `.env` (`xxxxx`...Setting Yours)
+```
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:xxxxx
+APP_DEBUG=true
+APP_URL=http://localhost
+API_KEY=xxxxx # Google Map API key
+```
+
 ### Database Setting (for Mac OSX)
 * cf. postgresql commands
    * https://www.postgresql.org/docs/current/app-psql.html
@@ -55,13 +68,53 @@ DB_USERNAME=travel_plan_map_user
 DB_PASSWORD=xxxx
 ``` 
 
-
-
 ### Serve app
 ```
 php artisan serve
 ```
 Then, visit http://127.0.0.1:8000/
+
+## Deployment to Production
+* Build js and css
+   * Then, created `public/js/app.js` and `public/css/style.css`
+```
+cd front/
+npm run build
+```
+* Merge js and css in `master` branch
+```
+git add public/
+git commit -m "some message"
+```
+* Setting heroku
+    * Login heroku DashBoard
+    * Resource
+      * Apply Add-on `Heroku Postgres`
+    * Setting
+       * Add Buildpack `heroku/php` and `heroku/nodejs`
+       * Config Vars ((*)...Setting Yours)
+          * `API_KEY` (*)(Google Map API Key)
+          * `APP_DEBUG`...`true`
+          * `APP_ENV`...`production`
+          * `APP_KEY`(*)
+          * `APP_NAME`...`Laravel`
+          * `APP_URL`(*)
+          * `DATABASE_URL`(*)
+          * `DB_CONNECTION`...`pgsql`
+          * `DB_DATABASE`(*)
+          * `DB_HOST`(*)
+          * `DB_PASSWORD`(*)
+          * `DB_PORT`...`5432`
+          * `DB_USERNAME`(*)
+          * `LOG_CHANNEL`...`errorlog`
+
+<img src="Heroku_config_vars.png">
+
+* Push `master` branch to heroku
+```
+git push heroku master
+```
+
 
 ## How to use this app
 
@@ -71,10 +124,9 @@ Then, visit http://127.0.0.1:8000/
 - Click "Search" button
 - Map with markers and destinations list are displayed
 - To regist a plan, input plan name and click "Regist" button
-- To edit a plan, click "Edit" button
 
 **View Registerd Plans**
-- Click "モデルプラン" tab
+- Click "Model Plans" tab
 - Click on any plan name
 - Map with markers and destinations list are displayed
 
