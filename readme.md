@@ -6,6 +6,25 @@
 * [composer](https://getcomposer.org/download/)
 * postgresql
 
+### Install Libraries
+
+* After install composer, execute below command
+```
+php composer.phar install
+```
+
+* If `In PackageManifest.php line 122: Undefined index: name` error occurred, execute below command 
+
+```
+php composer.phar update
+```
+
+* Generate APP_KEY
+
+```
+php artisan key:generate
+```
+
 ### Environment Variables Setting
 * Create `.env`
 * [Get Google Map API key](https://developers.google.com/maps/api-key-best-practices)
@@ -18,6 +37,13 @@ APP_DEBUG=true
 APP_URL=http://localhost
 API_KEY=xxxxx # Google Map API key
 ```
+
+### Serve app
+```
+php artisan serve
+```
+
+* Visit http://127.0.0.1:8000/
 
 ### Database Setting (for Mac OSX)
 * cf. postgresql commands
@@ -67,12 +93,6 @@ DB_DATABASE=postgres
 DB_USERNAME=travel_plan_map_user
 DB_PASSWORD=xxxx
 ``` 
-
-### Serve app
-```
-php artisan serve
-```
-Then, visit http://127.0.0.1:8000/
 
 ## Deployment to Production
 * Build js and css
